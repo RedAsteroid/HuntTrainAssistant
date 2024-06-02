@@ -33,7 +33,7 @@ internal unsafe static class ChatMessageHandler
                                 if (P.Config.AutoTeleport)
                                 {
                                     P.TeleportTo = (nearestAetheryte, m.TerritoryType.RowId);
-                                    Notify.Info("Engaging Autoteleport");
+                                    Notify.Info("开始自动传送");
                                 }
                             }
                             if (P.Config.AutoOpenMap)

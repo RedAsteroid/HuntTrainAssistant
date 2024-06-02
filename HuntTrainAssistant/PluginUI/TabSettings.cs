@@ -12,33 +12,33 @@ public class TabSettings
 		public void Draw()
 		{
 				new NuiBuilder().
-						Section("General settings")
+						Section("通用设置")
 						.Widget(() =>
 						{
-								ImGui.Checkbox("Plugin enabled", ref P.Config.Enabled);
+								ImGui.Checkbox("启用插件", ref P.Config.Enabled);
 								ImGui.SameLine();
-								ImGui.Checkbox("Debug mode", ref P.Config.Debug);
-								ImGui.Checkbox("Autoteleport to different zone", ref P.Config.AutoTeleport);
-								ImGui.Checkbox("Auto-open map when new location is linked", ref P.Config.AutoOpenMap);
-								ImGui.Checkbox("When conductor is set, suppress other people's messages", ref P.Config.SuppressChatOtherPlayers);
-								ImGui.Checkbox("Compensate for some aetherytes' position", ref P.Config.DistanceCompensationHack);
+								ImGui.Checkbox("调试模式", ref P.Config.Debug);
+								ImGui.Checkbox("自动传送到不同的地图", ref P.Config.AutoTeleport);
+								ImGui.Checkbox("检测到新的坐标链接后自动打开地图", ref P.Config.AutoOpenMap);
+								ImGui.Checkbox("设置车头后，屏蔽其他人的聊天信息", ref P.Config.SuppressChatOtherPlayers);
+								ImGui.Checkbox("补偿一些以太之光的位置判断", ref P.Config.DistanceCompensationHack);
 						})
 
-						.Section("Integrations")
+						.Section("联动")
 						.Widget(() =>
 						{
-								ImGui.Checkbox("Enable Sonar integration", ref P.Config.SonarIntegration);
+								ImGui.Checkbox("启用 Sonar 联动", ref P.Config.SonarIntegration);
 								ImGuiEx.PluginAvailabilityIndicator([new("SonarPlugin", "Sonar")]);
 								ImGui.Indent();
-								ImGuiEx.TextWrapped("When a hunt mark announced in chat, automatically teleport to the target world and zone");
+								ImGuiEx.TextWrapped("检测到聊天中的狩猎播报后，自动传送到目标服务器与目标地图");
 								ImGui.Unindent();
-								ImGui.Checkbox($"Enable auto-teleport to nearest aetheryte", ref P.Config.AutoVisitTeleportEnabled);
+								ImGui.Checkbox($"启用 自动传送到最近的以太之光", ref P.Config.AutoVisitTeleportEnabled);
 								ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter")]);
-								ImGui.Checkbox("Allow cross-world teleports", ref P.Config.AutoVisitCrossWorld);
+								ImGui.Checkbox("允许跨界传送", ref P.Config.AutoVisitCrossWorld);
 								ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream", new Version("2.1.1.0"))]);
-								ImGui.Checkbox("Allow cross-datacenter teleports", ref P.Config.AutoVisitCrossDC);
+								ImGui.Checkbox("允许跨数据中心传送", ref P.Config.AutoVisitCrossDC);
 								ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream", new Version("2.1.1.0"))]);
-								ImGui.Checkbox("Add click to teleport link into chat message", ref P.Config.AutoVisitModifyChat);
+								ImGui.Checkbox("在聊天信息中添加点击传送按钮", ref P.Config.AutoVisitModifyChat);
 						})
 
 						.Draw();

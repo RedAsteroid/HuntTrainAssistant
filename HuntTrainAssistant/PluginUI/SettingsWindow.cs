@@ -16,7 +16,7 @@ public unsafe class SettingsWindow : ConfigWindow
 
 		private SettingsWindow() : base()
 		{
-				this.WindowName = "HuntTrainAssistant Configuration";
+				this.WindowName = "HuntTrainAssistant 设置";
 				EzConfigGui.WindowSystem.AddWindow(this);
 		}
 
@@ -24,7 +24,7 @@ public unsafe class SettingsWindow : ConfigWindow
 		{
 				PatreonBanner.DrawRight();
 				ImGuiEx.EzTabBar("Bar", PatreonBanner.Text,
-						("Settings", TabSettings.Draw, null, true),
+						("设置", TabSettings.Draw, null, true),
 						("Debug", TabDebug.Draw, ImGuiColors.DalamudGrey3, true),
 						("Log", InternalLog.PrintImgui, ImGuiColors.DalamudGrey3, false)
 						);

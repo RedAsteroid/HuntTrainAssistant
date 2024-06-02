@@ -13,7 +13,7 @@ public unsafe class MainWindow : ConfigWindow
 						Click = (m) => { if (m == ImGuiMouseButton.Left) S.SettingsWindow.IsOpen = true; },
 						Icon = FontAwesomeIcon.Cog,
 						IconOffset = new(2, 2),
-						ShowTooltip = () => ImGui.SetTooltip("Open settings window"),
+						ShowTooltip = () => ImGui.SetTooltip("打开设置窗口"),
 				});
 		}
 
@@ -22,15 +22,15 @@ public unsafe class MainWindow : ConfigWindow
 				ImGui.SetNextItemWidth(150f);
 				var condIndex = 0;
 				var condNames = P.Config.Conductors.Select(x => x.Name).ToArray();
-				ImGuiEx.Text("Current conductors:");
+				ImGuiEx.Text("当前车头:");
 				ImGui.SameLine();
-				if (ImGui.SmallButton("Clear"))
+				if (ImGui.SmallButton("清除"))
 				{
 						P.Config.Conductors.Clear();
 				}
 				ImGui.SameLine();
 				// Remove selected conductor
-				if (ImGui.SmallButton("Remove selected"))
+				if (ImGui.SmallButton("移除所选"))
 				{
 						if (condIndex >= 0 && condIndex < P.Config.Conductors.Count)
 						{
@@ -39,7 +39,7 @@ public unsafe class MainWindow : ConfigWindow
 				}
 				ImGuiEx.SetNextItemFullWidth();
 				ImGui.ListBox("##conds", ref condIndex, condNames, condNames.Length, Math.Clamp(condNames.Length, 1, 3));
-				ImGuiEx.Text("Add conductor:");
+				ImGuiEx.Text("添加车头:");
 				ImGui.SameLine();
 				ImGui.SetNextItemWidth(150f);
 				var newCond = "";
@@ -53,43 +53,43 @@ public unsafe class MainWindow : ConfigWindow
 				}
 				if (P.TeleportTo.Territory == 0)
 				{
-						ImGuiEx.Text("Autoteleport: inactive");
-						if (ChatMessageHandler.LastMessageLoc.Aetheryte != null && ImGui.Button($"Autoteleport to {ChatMessageHandler.LastMessageLoc.Aetheryte}"))
+						ImGuiEx.Text("自动传送: 未激活");
+						if (ChatMessageHandler.LastMessageLoc.Aetheryte != null && ImGui.Button($"自动传送到: {ChatMessageHandler.LastMessageLoc.Aetheryte.GetPlaceName()}"))
 						{
 								P.TeleportTo = ChatMessageHandler.LastMessageLoc;
 						}
 				}
 				else
 				{
-						ImGuiEx.Text($"Autoteleport active.");
+						ImGuiEx.Text($"自动传送: 已激活");
 						ImGui.SameLine();
-						if (ImGui.SmallButton("Cancel"))
+						if (ImGui.SmallButton("取消"))
 						{
 								P.TeleportTo.Territory = 0;
 								P.TeleportTo.Aetheryte = null;
 						}
 						ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory.GetTerritoryName()}");
 				}
-				ImGui.Checkbox($"Sonar Auto-teleport", ref P.Config.AutoVisitTeleportEnabled);
+				ImGui.Checkbox($"Sonar 自动传送", ref P.Config.AutoVisitTeleportEnabled);
 				if (P.Config.AutoVisitTeleportEnabled)
 				{
 						if (!Utils.IsInHuntingTerritory())
 						{
-								ImGuiEx.HelpMarker("You are not in a hunting zone. Teleport enabled.", EColor.GreenBright, FontAwesomeIcon.Check.ToIconString());
+								ImGuiEx.HelpMarker("您不在狩猎地图内，传送已启用。", EColor.GreenBright, FontAwesomeIcon.Check.ToIconString());
 						}
 						else
 						{
-								ImGuiEx.HelpMarker("You are in a hunting zone. Teleport disabled. ", EColor.RedBright, "\uf00d");
+								ImGuiEx.HelpMarker("您已经在狩猎地图内，传送已禁用。", EColor.RedBright, "\uf00d");
 						}
 						ImGui.SameLine();
-						ImGui.Checkbox("C/W", ref P.Config.AutoVisitCrossWorld);
+						ImGui.Checkbox("允许跨界传送", ref P.Config.AutoVisitCrossWorld);
 						ImGui.SameLine();
-						ImGui.Checkbox("C/DC", ref P.Config.AutoVisitCrossDC);
+						ImGui.Checkbox("允许跨数据中心传送", ref P.Config.AutoVisitCrossDC);
 				}
 				if(S.SonarMonitor.Continuation != null)
 				{
-						ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"Waiting to arrive at: {S.SonarMonitor.Continuation.Value.World}/{S.SonarMonitor.Continuation.Value.Aetheryte.GetPlaceName()}");
-						if (ImGui.SmallButton("Cancel##arrival"))
+						ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"等待抵达: {S.SonarMonitor.Continuation.Value.World}/{S.SonarMonitor.Continuation.Value.Aetheryte.GetPlaceName()}");
+						if (ImGui.SmallButton("取消##arrival"))
 						{
 								S.SonarMonitor.Continuation = null;
 						}
