@@ -28,7 +28,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         Config = EzConfig.Init<Config>();
         EzConfigGui.Init(new MainWindow());
         EzConfigGui.Window.RespectCloseHotkey = false;
-        EzCmd.Add("/hta", OnChatCommand, "打开插件界面\n/hta clear: 清除当前车头\n/hta <玩家名称>: 添加新车头");
+        EzCmd.Add("/hta", OnChatCommand, "打开插件界面\n/hta clear: 清除当前设置的车头\n/hta <玩家名称>: 添加新车头");
         Svc.Chat.ChatMessage += ChatMessageHandler.Chat_ChatMessage;
         Svc.Framework.Update += Framework_Update;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;

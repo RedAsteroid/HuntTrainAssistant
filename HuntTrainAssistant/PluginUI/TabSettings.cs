@@ -30,13 +30,13 @@ public class TabSettings
 								ImGui.Checkbox("启用 Sonar 联动", ref P.Config.SonarIntegration);
 								ImGuiEx.PluginAvailabilityIndicator([new("SonarPlugin", "Sonar")]);
 								ImGui.Indent();
-								ImGuiEx.TextWrapped("检测到聊天中的狩猎播报后，自动传送到目标服务器与目标地图");
+								ImGuiEx.TextWrapped("检测到聊天中的狩猎标记通知时，自动传送到目标服务器与地图");
 								ImGui.Unindent();
-								ImGui.Checkbox($"启用 自动传送到最近的以太之光", ref P.Config.AutoVisitTeleportEnabled);
+								ImGui.Checkbox($"接收到通知时，自动传送到最近的以太之光", ref P.Config.AutoVisitTeleportEnabled);
 								ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter")]);
 								ImGui.Checkbox("允许跨界传送", ref P.Config.AutoVisitCrossWorld);
 								ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream", new Version("2.1.1.0"))]);
-								ImGui.Checkbox("允许跨数据中心传送", ref P.Config.AutoVisitCrossDC);
+								ImGui.Checkbox("允许超域传送", ref P.Config.AutoVisitCrossDC);
 								ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream", new Version("2.1.1.0"))]);
 								ImGui.Checkbox("在聊天信息中添加点击传送按钮", ref P.Config.AutoVisitModifyChat);
 						})

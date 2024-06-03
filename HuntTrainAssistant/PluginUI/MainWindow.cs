@@ -84,7 +84,7 @@ public unsafe class MainWindow : ConfigWindow
 						ImGui.SameLine();
 						ImGui.Checkbox("允许跨界传送", ref P.Config.AutoVisitCrossWorld);
 						ImGui.SameLine();
-						ImGui.Checkbox("允许跨数据中心传送", ref P.Config.AutoVisitCrossDC);
+						ImGui.Checkbox("允许超域传送", ref P.Config.AutoVisitCrossDC);
 				}
 				if(S.SonarMonitor.Continuation != null)
 				{
