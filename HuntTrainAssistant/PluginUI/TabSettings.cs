@@ -12,17 +12,17 @@ public class TabSettings
 		public void Draw()
 		{
 				new NuiBuilder().
-						Section("General settings")
-						.Widget(() =>
+						Section("基本设置") // General settings
+                        .Widget(() =>
 						{
-								ImGui.Checkbox("Plugin enabled", ref P.Config.Enabled);
+								ImGui.Checkbox("启用插件", ref P.Config.Enabled); // Plugin enabled
 								ImGui.SameLine();
-								ImGui.Checkbox("Debug mode", ref P.Config.Debug);
-								ImGui.Checkbox("Autoteleport to different zone", ref P.Config.AutoTeleport);
-								ImGui.Checkbox("Auto-open map when new location is linked", ref P.Config.AutoOpenMap);
-								ImGui.Checkbox("When conductor is set, suppress other people's messages", ref P.Config.SuppressChatOtherPlayers);
-								ImGui.Checkbox("Compensate for some aetherytes' position", ref P.Config.DistanceCompensationHack);
-						})
+								ImGui.Checkbox("调试模式", ref P.Config.Debug); // Debug mode
+								ImGui.Checkbox("自动传送到不同的地图", ref P.Config.AutoTeleport); // Autoteleport to different zone
+								ImGui.Checkbox("检测到新的坐标链接后自动打开地图", ref P.Config.AutoOpenMap); // Auto-open map when new location is linked
+								ImGui.Checkbox("设置车头后，屏蔽其他人的聊天信息", ref P.Config.SuppressChatOtherPlayers); // When conductor is set, suppress other people's messages
+								ImGui.Checkbox("补偿一些以太之光的位置判断", ref P.Config.DistanceCompensationHack); // Compensate for some aetherytes' position
+                        })
 						.Draw();
 		}
 }

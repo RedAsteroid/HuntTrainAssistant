@@ -186,9 +186,9 @@ public class SonarMonitor : IDisposable
 
 		public string GetGoToString(string world)
 		{
-				if (S.LifestreamIPC.CanVisitCrossDC(world)) return $"Go To (Cross-DC)";
-				return $"Go To";
-		}
+				if (S.LifestreamIPC.CanVisitCrossDC(world)) return $"前往 (超域传送)"; // Go To (Cross-DC)
+				return $"前往"; // Go To
+    }
 
 		public World ParseWorldFromMessage(string message)
 		{
@@ -219,11 +219,11 @@ public class SonarMonitor : IDisposable
 		public Expansion ParseExpansion(MapLinkPayload x)
 		{
         var bg = x.TerritoryType.Bg.ToString();
-        if (bg.StartsWith("ex1")) return Expansion.Heavensward;
-        if (bg.StartsWith("ex2")) return Expansion.Stormblood;
-        if (bg.StartsWith("ex3")) return Expansion.Shadowbringers;
-        if (bg.StartsWith("ex4")) return Expansion.Endwalker;
-        if (bg.StartsWith("ex5")) return Expansion.Dawntrail;
-        return Expansion.ARealmReborn;
+        if (bg.StartsWith("ex1")) return Expansion.苍穹之禁城;
+        if (bg.StartsWith("ex2")) return Expansion.红莲之狂潮;
+        if (bg.StartsWith("ex3")) return Expansion.暗影之逆焰;
+        if (bg.StartsWith("ex4")) return Expansion.晓月之终途;
+        if (bg.StartsWith("ex5")) return Expansion.黄金のレガシー;
+        return Expansion.重生之境;
     }
 }

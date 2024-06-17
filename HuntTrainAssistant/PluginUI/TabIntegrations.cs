@@ -13,35 +13,35 @@ public class TabIntegrations
     public void Draw()
     {
         new NuiBuilder()
-        .Section("Plugins")
+        .Section("插件") // Plugins
         .Widget(() =>
         {
-            ImGui.Checkbox("Enable Sonar integration", ref P.Config.SonarIntegration);
+            ImGui.Checkbox("启用 Sonar 联动", ref P.Config.SonarIntegration); // Enable Sonar integration
             ImGuiEx.PluginAvailabilityIndicator([new("SonarPlugin", "Sonar")]);
             ImGui.Indent();
-            ImGuiEx.TextWrapped("When a hunt mark announced in chat, automatically teleport to the target world and zone");
-            ImGui.Checkbox("Add click to teleport link into chat message", ref P.Config.AutoVisitModifyChat);
+            ImGuiEx.TextWrapped("检测到聊天中的狩猎标记通知时，自动传送到目标服务器与地图"); // When a hunt mark announced in chat, automatically teleport to the target world and zone
+            ImGui.Checkbox("在聊天信息中添加点击传送按钮", ref P.Config.AutoVisitModifyChat); // Add click to teleport link into chat message
             ImGui.Unindent();
             ImGui.Separator();
-            ImGui.Checkbox("Enable HuntAlerts integration", ref P.Config.HuntAlertsIntegration);
+            ImGui.Checkbox("启用 HuntAlerts 联动", ref P.Config.HuntAlertsIntegration); // Enable HuntAlerts integration
             ImGuiEx.PluginAvailabilityIndicator([new("HuntAlerts", new Version("1.2.1.3"))]);
-            ImGuiEx.TextWrapped("When a hunt mark notification is received from server, automatically teleport to the target world and zone");
+            ImGuiEx.TextWrapped("接收到服务器发送的狩猎标记时，自动传送到目标服务器与地图"); // When a hunt mark notification is received from server, automatically teleport to the target world and zone
         })
 
-        .Section("Common Settings")
+        .Section("通用设置") // Common Settings
         .Widget(() =>
         {
-            ImGuiEx.TextWrapped($"These options are common for all integrations");
+            ImGuiEx.TextWrapped($"以下为所有插件联动的通用选项"); // These options are common for all integrations
             ImGui.Separator();
-            ImGui.Checkbox($"Teleport to nearest aetheryte upon receiving announcement", ref P.Config.AutoVisitTeleportEnabled);
+            ImGui.Checkbox($"接收到通知时，自动传送到最近的以太之光", ref P.Config.AutoVisitTeleportEnabled); // Teleport to nearest aetheryte upon receiving announcement
             ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter")]);
-            ImGui.Checkbox("Allow cross-world teleports", ref P.Config.AutoVisitCrossWorld);
+            ImGui.Checkbox("允许跨界传送", ref P.Config.AutoVisitCrossWorld); // Allow cross-world teleports
             ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream", new Version("2.1.1.0"))]);
-            ImGui.Checkbox("Allow cross-datacenter teleports", ref P.Config.AutoVisitCrossDC);
+            ImGui.Checkbox("允许超域传送", ref P.Config.AutoVisitCrossDC); // Allow cross-datacenter teleports
             ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream", new Version("2.1.1.0"))]);
         })
 
-        .Section("Trigger Filters")
+        .Section("触发过滤") // Trigger Filters
         .Widget(() =>
         {
             foreach(var rank in Enum.GetValues<Rank>())

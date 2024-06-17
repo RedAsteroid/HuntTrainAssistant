@@ -5,4 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace HuntTrainAssistant.DataStructures;
-public enum Expansion { Unknown, ARealmReborn, Heavensward, Stormblood, Shadowbringers, Endwalker, Dawntrail }
+public enum Expansion { Unknown, 重生之境, 苍穹之禁城, 红莲之狂潮, 暗影之逆焰, 晓月之终途, 黄金のレガシー }
+//public enum Expansion { Unknown, ARealmReborn, Heavensward, Stormblood, Shadowbringers, Endwalker, Dawntrail }
+

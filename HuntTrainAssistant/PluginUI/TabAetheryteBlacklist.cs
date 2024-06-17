@@ -14,11 +14,11 @@ public class TabAetheryteBlacklist
 
 		public void Draw()
 		{
-				ImGuiEx.Text($"These aetherytes will always be ignored");
+				ImGuiEx.Text($"这些以太之光将被忽略"); // These aetherytes will always be ignored
 				ImGui.SetNextItemWidth(200f);
-				ImGui.InputTextWithHint("##fltr", "Search", ref Filter, 100);
+				ImGui.InputTextWithHint("##fltr", "搜索", ref Filter, 100); // Search
 				ImGui.SameLine();
-				ImGui.Checkbox("Only selected", ref OnlySel);
+				ImGui.Checkbox("仅选定", ref OnlySel); // Only selected
 				foreach(var x in Svc.Data.GetExcelSheet<Aetheryte>())
 				{
 						var name = x.PlaceName.Value.Name.ExtractText();
