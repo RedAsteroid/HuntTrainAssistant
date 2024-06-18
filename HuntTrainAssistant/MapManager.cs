@@ -33,7 +33,7 @@ internal static class MapManager
                     var mapMarker = Svc.Data.GetExcelSheet<MapMarker>().FirstOrDefault(m => (m.DataType == 3 && m.DataKey == data.RowId));
                     if (mapMarker == null)
                     {
-                        DuoLog.Error($"Cannot find aetherytes position for {maplinkMessage.PlaceName}#{data.PlaceName.Value.Name}");
+                        DuoLog.Error($"找不到以太之光的位置: {maplinkMessage.PlaceName}#{data.PlaceName.Value.Name}"); // Cannot find aetherytes position for
                         continue;
                     }
                     Vector2 compensationDelta = getDistanceCompensationHackDelta(data.PlaceName.Value.Name);

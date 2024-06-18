@@ -118,7 +118,7 @@ public class SonarMonitor : IDisposable
 				{
 						if (Player.CurrentWorld == world)
 						{
-								DuoLog.Information($"Same-world teleport: {world}");
+								DuoLog.Information($"服务器内传送: {world}"); // Same-world teleport:
 								P.TeleportTo = (aetheryte, aetheryte.Territory.Row);
 								if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
 								EzConfigGui.Window.IsOpen = true;
@@ -132,7 +132,7 @@ public class SonarMonitor : IDisposable
 												S.LifestreamIPC.TPAndChangeWorld(world, false, null, true, null, false, false);
 												if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
 												Continuation = (aetheryte, world);
-												DuoLog.Information($"Cross-world teleport: {world}");
+												DuoLog.Information($"跨界传送 {world}"); // Cross-world teleport:
 												EzConfigGui.Window.IsOpen = true;
 										}
 										else if ((force || P.Config.AutoVisitCrossDC) && S.LifestreamIPC.CanVisitCrossDC(world))
@@ -140,13 +140,13 @@ public class SonarMonitor : IDisposable
 												S.LifestreamIPC.TPAndChangeWorld(world, true, null, true, null, false, false);
 												if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
 												Continuation = (aetheryte, world);
-												DuoLog.Information($"Cross-DC teleport: {world}");
+												DuoLog.Information($"超域传送 {world}"); // Cross-DC teleport:
 												EzConfigGui.Window.IsOpen = true;
 										}
 										else
 										{
-												DuoLog.Information($"Can not visit {world}");
-										}
+												DuoLog.Information($"无法传送到: {world}"); // Can not visit
+                    }
 								}
 						}
 				}
