@@ -30,7 +30,7 @@ public class ContextMenuManager : IDisposable
 		{
 				ContextMenu = new(Svc.PluginInterface);
 				MenuItemAddConductor = new GameObjectContextMenuItem(
-						new SeStringBuilder().AddUiForeground("Add as conductor", 578).Build(), AssignConductor);
+						new SeStringBuilder().AddUiForeground("添加为车头", 578).Build(), AssignConductor); // Add as conductor
 				ContextMenu.OnOpenGameObjectContextMenu += OpenContextMenu;
 		}
 

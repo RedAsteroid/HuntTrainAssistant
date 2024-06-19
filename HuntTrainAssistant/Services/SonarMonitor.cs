@@ -132,7 +132,7 @@ public class SonarMonitor : IDisposable
 												S.LifestreamIPC.TPAndChangeWorld(world, false, null, true, null, false, false);
 												if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
 												Continuation = (aetheryte, world);
-												DuoLog.Information($"跨界传送 {world}"); // Cross-world teleport:
+												DuoLog.Information($"跨界传送: {world}"); // Cross-world teleport:
 												EzConfigGui.Window.IsOpen = true;
 										}
 										else if ((force || P.Config.AutoVisitCrossDC) && S.LifestreamIPC.CanVisitCrossDC(world))
@@ -140,7 +140,7 @@ public class SonarMonitor : IDisposable
 												S.LifestreamIPC.TPAndChangeWorld(world, true, null, true, null, false, false);
 												if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
 												Continuation = (aetheryte, world);
-												DuoLog.Information($"超域传送 {world}"); // Cross-DC teleport:
+												DuoLog.Information($"超域传送: {world}"); // Cross-DC teleport:
 												EzConfigGui.Window.IsOpen = true;
 										}
 										else
