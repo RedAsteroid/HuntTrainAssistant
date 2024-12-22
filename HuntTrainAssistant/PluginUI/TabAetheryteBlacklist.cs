@@ -18,7 +18,7 @@ public class TabAetheryteBlacklist
 				ImGui.SetNextItemWidth(200f);
 				ImGui.InputTextWithHint("##fltr", "搜索", ref Filter, 100); // Search
 				ImGui.SameLine();
-				ImGui.Checkbox("仅选定", ref OnlySel); // Only selected
+				ImGui.Checkbox("仅显示选定的以太之光", ref OnlySel); // Only selected
 				foreach(var x in Svc.Data.GetExcelSheet<Aetheryte>())
 				{
 						var name = x.PlaceName.Value.Name.ExtractText();

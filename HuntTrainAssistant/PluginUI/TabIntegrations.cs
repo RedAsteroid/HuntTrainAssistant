@@ -1,4 +1,5 @@
-﻿using HuntTrainAssistant.DataStructures;
+﻿using ECommons.ExcelServices;
+using HuntTrainAssistant.DataStructures;
 using NightmareUI.PrimaryUI;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,9 @@ public class TabIntegrations
             ImGui.Checkbox("启用 Sonar 联动", ref P.Config.SonarIntegration); // Enable Sonar integration
             ImGuiEx.PluginAvailabilityIndicator([new("SonarPlugin", "Sonar")]);
             ImGui.Indent();
-            ImGuiEx.TextWrapped("检测到聊天中的狩猎标记通知时，自动传送到目标服务器与地图"); // When a hunt mark announced in chat, automatically teleport to the target world and zone
+            ImGuiEx.TextWrapped("检测到聊天中的 Sonar 狩猎标记通知时，自动传送到目标服务器与地图"); // When a hunt mark announced in chat, automatically teleport to the target world and zone
             ImGui.Checkbox("在聊天信息中添加点击传送按钮", ref P.Config.AutoVisitModifyChat); // Add click to teleport link into chat message
+            ImGui.Checkbox("在传送后切换副本区", ref P.Config.EnableSonarInstanceSwitching); // Change instance after teleporting
             ImGui.Unindent();
             ImGui.Separator();
             ImGui.Checkbox("启用 HuntAlerts 联动", ref P.Config.HuntAlertsIntegration); // Enable HuntAlerts integration
@@ -35,10 +37,14 @@ public class TabIntegrations
             ImGui.Separator();
             ImGui.Checkbox($"接收到通知时，自动传送到最近的以太之光", ref P.Config.AutoVisitTeleportEnabled); // Teleport to nearest aetheryte upon receiving announcement
             ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter")]);
+            ImGuiEx.PluginAvailabilityIndicator([new("Lifestream")]);
             ImGui.Checkbox("允许跨界传送", ref P.Config.AutoVisitCrossWorld); // Allow cross-world teleports
-            ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream", new Version("2.1.1.0"))]);
+            ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream")]);
+            ImGuiEx.PluginAvailabilityIndicator([new("Lifestream")]);
             ImGui.Checkbox("允许超域传送", ref P.Config.AutoVisitCrossDC); // Allow cross-datacenter teleports
-            ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream", new Version("2.1.1.0"))]);
+            ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream")]);
+            ImGuiEx.PluginAvailabilityIndicator([new("Lifestream")]);
+            ImGuiEx.TreeNodeCollapsingHeader($"黑名单服务器 (当前有 {P.Config.WorldBlacklist.Count} 个在黑名单)###blworlds", DrawWorldBlacklist);
         })
 
         .Section("触发过滤") // Trigger Filters
@@ -66,5 +72,26 @@ public class TabIntegrations
         })
 
         .Draw();
+    }
+
+    void DrawWorldBlacklist()
+    {
+        ImGuiEx.TextWrapped($"以下所选的服务器不会启用自动传送，但是您仍然可以点击聊天中的传送链接手动前往。"); // Auto-teleport will not be engaged to the worlds selected below. You can still use chat link to get to them manually.
+        foreach (var r in Enum.GetValues<ExcelWorldHelper.Region>())
+        {
+            ImGuiEx.CollectionCheckbox($"地区 {r}", ExcelWorldHelper.GetPublicWorlds(r).Select(x => x.RowId), P.Config.WorldBlacklist);
+            ImGui.Indent();
+            foreach(var dc in ExcelWorldHelper.GetDataCenters(r))
+            {
+                ImGuiEx.CollectionCheckbox($"{dc.Name} 数据中心", ExcelWorldHelper.GetPublicWorlds(dc.RowId).Select(x => x.RowId), P.Config.WorldBlacklist);
+                ImGui.Indent();
+                foreach(var w in ExcelWorldHelper.GetPublicWorlds(dc.RowId))
+                {
+                    ImGuiEx.CollectionCheckbox($"{w.Name}", w.RowId, P.Config.WorldBlacklist);
+                }
+                ImGui.Unindent();
+            }
+            ImGui.Unindent();
+        }
     }
 }

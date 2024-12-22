@@ -1,5 +1,6 @@
 ﻿using ECommons.ImGuiMethods;
 using ECommons.SimpleGui;
+using HuntTrainAssistant.Tasks;
 using System.Runtime.Intrinsics.X86;
 
 namespace HuntTrainAssistant.PluginUI;
@@ -8,13 +9,20 @@ public unsafe class MainWindow : ConfigWindow
 {
     public MainWindow() : base()
     {
-				TitleBarButtons.Add(new()
+        TitleBarButtons.Add(new()
 				{
 						Click = (m) => { if (m == ImGuiMouseButton.Left) S.SettingsWindow.IsOpen = true; },
 						Icon = FontAwesomeIcon.Cog,
 						IconOffset = new(2, 2),
 						ShowTooltip = () => ImGui.SetTooltip("打开设置窗口"), // Open settings window
-                });
+				});
+        TitleBarButtons.Add(new()
+        {
+            Click = (m) => { if(P.Config.PfinderEnable) { TaskCreateHuntPF.Enqueue(); } else { DuoLog.Warning($"创建怪物狩猎招募按钮未启用，请在设置中启用。"); } }, // Create party finder button is not enabled. Open settings to enable it.
+            Icon = FontAwesomeIcon.PeopleGroup,
+            IconOffset = new(2, 2),
+            ShowTooltip = () => ImGui.SetTooltip("创建 怪物狩猎招募"), // Create hunting party finder
+        });
 		}
 
     public override void Draw()
@@ -25,7 +33,7 @@ public unsafe class MainWindow : ConfigWindow
 				ImGuiEx.Text("当前车头:"); // Current conductors:
 				ImGui.SameLine();
 				if (ImGui.SmallButton("清除")) // Clear
-        {
+				{
 						P.Config.Conductors.Clear();
 				}
 				ImGui.SameLine();
@@ -51,11 +59,24 @@ public unsafe class MainWindow : ConfigWindow
 								newCond = "";
 						}
 				}
+				// Show KilledARanks
+				if (P.Config.ShowKilledARanks)
+				{
+					if (P.KilledARanks.Count > 0)
+					{
+						ImGuiEx.Text($"当前记录击杀A怪: {P.KilledARanks.Print(", ")}");
+					}
+					if (P.KilledARanks.Count == 0)
+					{
+						ImGuiEx.Text($"当前记录击杀A怪: 暂无");
+					}
+				}
+				ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 4);
 				if (P.TeleportTo.Territory == 0)
 				{
 						ImGuiEx.Text("自动传送: 未激活"); // Autoteleport: inactive
 						if (ChatMessageHandler.LastMessageLoc.Aetheryte != null && ImGui.Button($"自动传送到: {ChatMessageHandler.LastMessageLoc.Aetheryte.PlaceName.Value.Name}")) // Autoteleport to
-            {
+						{
 								P.TeleportTo = ChatMessageHandler.LastMessageLoc;
 						}
 				}
@@ -68,18 +89,18 @@ public unsafe class MainWindow : ConfigWindow
 								P.TeleportTo.Territory = 0;
 								P.TeleportTo.Aetheryte = null;
 						}
-						ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory.GetTerritoryName()}");
+						ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory.GetTerritoryName()} i{P.TeleportTo.Instance}");
 				}
 				ImGui.Checkbox($"Sonar 自动传送", ref P.Config.AutoVisitTeleportEnabled); // Sonar Auto-teleport
 				if (P.Config.AutoVisitTeleportEnabled)
 				{
 						if (!Utils.IsInHuntingTerritory())
 						{
-								ImGuiEx.HelpMarker("您不在狩猎地图内，传送已启用。", EColor.GreenBright, FontAwesomeIcon.Check.ToIconString()); // You are not in a hunting zone. Teleport enabled.
+								ImGuiEx.HelpMarker("您不在狩猎地图内，Sonar 自动传送已启用", EColor.GreenBright, FontAwesomeIcon.Check.ToIconString()); // You are not in a hunting zone. Teleport enabled.
 						}
 						else
 						{
-								ImGuiEx.HelpMarker("您已经在狩猎地图内，传送已禁用。", EColor.RedBright, "\uf00d"); // You are in a hunting zone. Teleport disabled. 
+								ImGuiEx.HelpMarker("您已经在狩猎地图内，Sonar 自动传送已禁用", EColor.RedBright, "\uf00d"); // You are in a hunting zone. Teleport disabled.
 						}
 						ImGui.SameLine();
 						ImGui.Checkbox("允许跨界传送", ref P.Config.AutoVisitCrossWorld); // C/W
@@ -88,10 +109,10 @@ public unsafe class MainWindow : ConfigWindow
 				}
 				if(S.SonarMonitor.Continuation != null)
 				{
-						ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"等待抵达: {S.SonarMonitor.Continuation.Value.World}/{S.SonarMonitor.Continuation.Value.Aetheryte.GetPlaceName()}"); // Waiting to arrive at:
-				if (ImGui.SmallButton("取消##arrival")) // Cancel
+						ImGuiEx.Text(GradientColor.Get(EColor.RedBright, EColor.YellowBright), $"等待抵达: {S.SonarMonitor.Continuation.Value.World}/{S.SonarMonitor.Continuation.Value.Aetheryte.GetPlaceName()} i{S.SonarMonitor.Continuation.Value.Instance}");
+						if (ImGui.SmallButton("取消##arrival")) // Cancel
 						{
-						S.SonarMonitor.Continuation = null;
+								S.SonarMonitor.Continuation = null;
 						}
 				}
     }
