@@ -27,6 +27,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     public TaskManager TaskManager;
     public int LastInstance = 0;
     public HashSet<DawntrailARank> KilledARanks = [];
+    public string CommandComments;
 
     public HuntTrainAssistant(IDalamudPluginInterface pi)
     {
@@ -36,7 +37,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         Config = EzConfig.Init<Config>();
         EzConfigGui.Init(new MainWindow());
         EzConfigGui.Window.RespectCloseHotkey = false;
-        EzCmd.Add("/hta", OnChatCommand, "切换显示插件界面\n/hta clear → 清除当前设置的车头\n/hta <玩家名称> → 添加新车头\n/hta pf → 创建怪物狩猎招募(参数不区分大小写, 需要启用设置)");
+        EzCmd.Add("/hta", OnChatCommand, "切换显示插件界面\n/hta clear → 清除当前设置的车头\n/hta <玩家名称> → 添加新车头\n/hta pf <自由留言内容> → 创建怪物狩猎招募(参数不区分大小写，无参数则使用设置的自由留言, 需要启用设置)");
         Svc.Chat.ChatMessage += ChatMessageHandler.Chat_ChatMessage;
         Svc.Framework.Update += Framework_Update;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
@@ -99,7 +100,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                 {
                     if (Svc.ClientState.LocalPlayer.CastActionId == 5)
                     {
-                        if (!Svc.Condition[ConditionFlag.Casting]) // 在上坐骑即将完成时发起传送，将会锁死在传送状态无法传送，需要切换地图(比如返回)解除。虽然通过增加延迟可以一定程度上避免，但在计算机性能不佳(狩猎玩家人数过多cpu性能不足等原因)并且插件处于自动传送时上坐骑，仍有可能发生锁死的情况。
+                        if (!Svc.Condition[ConditionFlag.Casting]) // 在上坐骑即将完成时发起传送，将会锁死在传送状态无法传送，需要切换地图(比如返回、进入副本)解除。虽然通过增加延迟可以一定程度上避免，但在计算机性能不佳(狩猎玩家人数过多cpu性能不足等原因)并且插件处于自动传送时上坐骑，仍有可能发生锁死的情况。
                         {
                             EzThrottler.Throttle("Teleport", 2000, true);
                         }
@@ -172,11 +173,26 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         {
             P.Config.Conductors.Clear();
         }
-        else if (arguments.Equals("PF", StringComparison.OrdinalIgnoreCase))
+        // 创建怪物狩猎招募
+        else if (arguments.Equals("pf", StringComparison.OrdinalIgnoreCase))
         {
             if (P.Config.PfinderEnable)
             {
                 TaskCreateHuntPF.Enqueue();
+            }
+            else
+            {
+                DuoLog.Warning($"创建怪物狩猎招募按钮未启用，请在设置中启用。");
+            }
+        }
+        // 创建怪物狩猎招募，自定义自由留言
+        else if (arguments.StartsWith("pf ", StringComparison.OrdinalIgnoreCase)) 
+        {
+            arguments = arguments[3..].Trim();
+            if (P.Config.PfinderEnable)
+            {
+                CommandComments = arguments;
+                TaskCreateHuntPF.Enqueue2();
             }
             else
             {
