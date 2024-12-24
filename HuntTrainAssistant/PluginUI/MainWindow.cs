@@ -64,14 +64,14 @@ public unsafe class MainWindow : ConfigWindow
 				{
 					if (P.KilledARanks.Count > 0)
 					{
-						ImGuiEx.Text($"当前记录击杀A怪: {P.KilledARanks.Print(", ")}");
+						ImGuiEx.Text($"当前已记录击杀A怪({P.KilledARanks.Count}): {P.KilledARanks.Print(", ")}");
 					}
 					if (P.KilledARanks.Count == 0)
 					{
-						ImGuiEx.Text($"当前记录击杀A怪: 暂无");
+						ImGuiEx.Text($"当前已记录击杀A怪: 暂无");
 					}
 				}
-				ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 4);
+				ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3);
 				if (P.TeleportTo.Territory == 0)
 				{
 						ImGuiEx.Text("自动传送: 未激活"); // Autoteleport: inactive

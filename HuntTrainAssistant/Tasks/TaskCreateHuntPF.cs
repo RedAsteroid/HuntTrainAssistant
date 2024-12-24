@@ -159,6 +159,7 @@ public static unsafe class TaskCreateHuntPF
                 Chat.Instance.ExecuteCommand("/pfinder");
                 Chat.Instance.ExecuteCommand($"/e 已完成创建怪物狩猎招募");
                 Chat.Instance.ExecuteCommand($"/e 自由留言内容：{P.CommandComments}");
+                P.CommandComments = null;
                 return true;
             }
             return false;
