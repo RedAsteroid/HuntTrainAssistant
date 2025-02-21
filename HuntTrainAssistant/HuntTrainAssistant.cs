@@ -13,7 +13,7 @@ using HuntTrainAssistant.DataStructures;
 using HuntTrainAssistant.PluginUI;
 using HuntTrainAssistant.Services;
 using HuntTrainAssistant.Tasks;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace HuntTrainAssistant;
 
@@ -21,7 +21,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 {
     internal static HuntTrainAssistant P;
     internal Config Config;
-    internal (Aetheryte Aetheryte, uint Territory, int Instance) TeleportTo = default;
+    internal ArrivalData TeleportTo = null;
     internal bool IsMoving = false;
     internal Vector3 LastPosition = Vector3.Zero;
     public TaskManager TaskManager;
@@ -55,9 +55,9 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 		private void ClientState_TerritoryChanged(ushort e)
     {
         LastInstance = 0;
-        if(TeleportTo.Instance > 0 && e == TeleportTo.Territory)
+        if(TeleportTo != null && TeleportTo.Instance > 0 && e == TeleportTo.Territory)
         {
-            TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.Row);
+            TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, TeleportTo.Aetheryte.Territory.RowId);
         }
         TeleportTo = default;
         if (!Utils.IsInHuntingTerritory())
@@ -72,7 +72,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     {
         if(P.Config.Debug)
         {
-            if(EzThrottler.Throttle("InformDebug", 600000)) DuoLog.Warning("您正在使用 HuntTrainAssistant 的 Debug 模式，这会破坏插件的功能。请在您不需要调试时禁用 Debug 模式。"); // You are using debug mode in HuntTrainAssistant which will break functions of the plugin. Please disable debug mode once you don't need it.
+            if(EzThrottler.Throttle("InformDebug", 600000)) DuoLog.Warning("您正在使用 HuntTrainAssistant 的 Debug 模式，这会破坏插件的功能。请在您不需要调试时禁用 Debug 模式。");
         }
         if(LastInstance != UIState.Instance()->PublicInstance.InstanceId)
         {
@@ -92,7 +92,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                 }
             }
         }
-        if (Player.Interactable && TeleportTo.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
+        if (Player.Interactable && TeleportTo?.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
             if (IsScreenReady())
             {
@@ -100,7 +100,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                 {
                     if (Svc.ClientState.LocalPlayer.CastActionId == 5)
                     {
-                        if (!Svc.Condition[ConditionFlag.Casting]) // 在上坐骑即将完成时发起传送，将会锁死在传送状态无法传送，需要切换地图(比如返回、进入副本)解除。虽然通过增加延迟可以一定程度上避免，但在计算机性能不佳(狩猎玩家人数过多cpu性能不足等原因)并且插件处于自动传送时上坐骑，仍有可能发生锁死的情况。
+                        if (!Svc.Condition[ConditionFlag.Casting])
                         {
                             EzThrottler.Throttle("Teleport", 2000, true);
                         }
@@ -142,9 +142,9 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         }
         if (Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
         {
-            if(TeleportTo.Instance > 0)
+            if((TeleportTo?.Instance ?? 0) > 0)
             {
-                TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.Row);
+                TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.RowId);
             }
             TeleportTo = default;
         }
@@ -186,7 +186,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
             }
         }
         // 创建怪物狩猎招募，自定义自由留言
-        else if (arguments.StartsWith("pf ", StringComparison.OrdinalIgnoreCase)) 
+        else if (arguments.StartsWith("pf ", StringComparison.OrdinalIgnoreCase))
         {
             arguments = arguments[3..].Trim();
             if (P.Config.PfinderEnable)

@@ -17,46 +17,47 @@ public unsafe class TabSettings
 		{
 				if(OpenFileDialog.IsSelecting())
 				{
-						ImGuiEx.Text("正在等待选择文件..."); // Waiting for file selection...
+						ImGuiEx.Text("正在等待选择文件...");
 						return;
 				}
 				new NuiBuilder().
-                        Section("基本设置") // General settings
-                        .Widget(() =>
+						Section("基本设置")
+						.Widget(() =>
 						{
-								ImGui.Checkbox("启用插件", ref P.Config.Enabled); // Plugin enabled
+								ImGui.Checkbox("启用插件", ref P.Config.Enabled);
 								ImGui.SameLine();
 								ImGui.Checkbox("Debug 模式", ref P.Config.Debug);
-								ImGui.Checkbox("自动传送到不同的地图", ref P.Config.AutoTeleport); // Autoteleport to different zone
+								ImGui.Checkbox("自动传送到不同的地图", ref P.Config.AutoTeleport);
 								ImGui.Indent();
-								ImGui.Checkbox("在传送后自动切换到号副本区", ref P.Config.AutoSwitchInstanceToOne); // Auto-switch to instance 1 after teleporting
+								ImGui.Checkbox("在传送后自动切换到号副本区", ref P.Config.AutoSwitchInstanceToOne);
 								ImGui.Unindent();
-								ImGui.Checkbox("检测到新的旗帜标记后自动打开地图", ref P.Config.AutoOpenMap); // Auto-open map when new location is linked
+								ImGui.Checkbox("检测到新的旗帜标记后自动打开地图", ref P.Config.AutoOpenMap);
 								ImGui.Indent();
-								ImGui.Checkbox("禁止在上一个标记位置相同时重复打开地图", ref P.Config.NoDuplicateFlags); // Don't open flag that was previously open
+								ImGui.Checkbox("禁止在上一个标记位置相同时重复打开地图", ref P.Config.NoDuplicateFlags);
 								ImGui.Unindent();
-								ImGui.Checkbox("设置车头后，屏蔽其他人的聊天信息", ref P.Config.SuppressChatOtherPlayers); // When conductor is set, suppress other people's messages
-								ImGui.Checkbox("补偿一些以太之光的位置判断", ref P.Config.DistanceCompensationHack); // Compensate for some aetherytes' position
-								ImGui.Checkbox("在2只A怪被击杀后，自动传送将前往下一个副本区", ref P.Config.AutoSwitchInstanceTwoRanks); // Auto-teleport to next instance if two A-marks killed
-								ImGui.Checkbox("添加右键菜单选项", ref P.Config.ContextMenu); // Context menu integration
-								ImGui.Checkbox("启用 一键创建队员招募按钮", ref P.Config.PfinderEnable); // Enable one-click party finder creation button
+								ImGui.Checkbox("设置车头后，屏蔽其他人的聊天信息", ref P.Config.SuppressChatOtherPlayers);
+								ImGui.Checkbox("补偿一些以太之光的位置判断", ref P.Config.DistanceCompensationHack);
+								ImGui.Checkbox("在2只A怪被击杀后，自动传送将前往下一个副本区", ref P.Config.AutoSwitchInstanceTwoRanks);
+								ImGui.Checkbox("添加右键菜单选项", ref P.Config.ContextMenu);
+								ImGui.Checkbox("启用 一键创建队员招募按钮", ref P.Config.PfinderEnable);
 								ImGui.Checkbox("显示 记录A怪击杀信息在主窗口", ref P.Config.ShowKilledARanks);
+
 								ImGui.Indent();
-								ImGuiEx.Text($"队员招募自由留言"); // Party finder comment
+								ImGuiEx.Text($"队员招募自由留言");
 								ImGuiEx.SetNextItemFullWidth();
 								ImGui.InputText($"##pfindercommenr", ref P.Config.PfinderString, 150);
 								ImGui.Unindent();
 						})
-                        .Section("通知") // Notifications
-                        .Widget(() =>
+						.Section("通知")
+						.Widget(() =>
 						{
-								ImGuiEx.Text("需要安装 NotificationMaster 插件"); // NotificationMaster plugin required
+								ImGuiEx.Text("需要安装 NotificationMaster 插件");
 								ImGuiEx.PluginAvailabilityIndicator([new("NotificationMaster"), new("NotificationMaster.NXIV", "NotificationMaster (from NightmareXIV repo)")], "", false);
-								ImGui.Checkbox("车头发送信息时，播放音频", ref P.Config.AudioAlert); // Play audio when conductor posts message
+								ImGui.Checkbox("车头发送信息时，播放音频", ref P.Config.AudioAlert);
 								ImGui.Indent();
-								ImGuiEx.InputWithRightButtonsArea(() => ImGui.InputTextWithHint("##pathToAudio", "音频文件路径", ref P.Config.AudioAlertPath, 500), () => // Path to audio file
-                                {
-										if(ImGui.Button("选择...")) // Select...
+								ImGuiEx.InputWithRightButtonsArea(() => ImGui.InputTextWithHint("##pathToAudio", "音频文件路径", ref P.Config.AudioAlertPath, 500), () =>
+								{
+										if(ImGui.Button("选择..."))
 										{
 												OpenFileDialog.SelectFile((x) =>
 												{
@@ -70,23 +71,23 @@ public unsafe class TabSettings
 										}
 								});
 								ImGui.SetNextItemWidth(150f);
-								ImGui.SliderFloat("音量", ref P.Config.AudioAlertVolume, 0f, 1f); // Volume
-								ImGui.Checkbox("只在游戏最小化时播放", ref P.Config.AudioAlertOnlyMinimized); // Play only when game is not minimized
+								ImGui.SliderFloat("音量", ref P.Config.AudioAlertVolume, 0f, 1f);
+								ImGui.Checkbox("只在游戏最小化时播放", ref P.Config.AudioAlertOnlyMinimized);
 								ImGui.SetNextItemWidth(150f);
-								ImGuiEx.SliderIntAsFloat("音频通知的最小间隔时间", ref P.Config.AudioThrottle, 0, 10000); // Minimal interval between audio notifications
+								ImGuiEx.SliderIntAsFloat("音频通知的最小间隔时间", ref P.Config.AudioThrottle, 0, 10000);
 								ImGui.Unindent();
-								ImGui.Checkbox("在任务栏闪烁车头的聊天信息", ref P.Config.FlashTaskbar); // Flash taskbar on conductor message
-								ImGui.Checkbox("显示车头聊天信息的托盘弹出通知", ref P.Config.TrayNotification); // Show tray popup notification on conductor message
-						})
-                        .Section("触发器") // Triggers
-                        .Widget(() =>
+								ImGui.Checkbox("在任务栏闪烁车头的聊天信息", ref P.Config.FlashTaskbar);
+								ImGui.Checkbox("显示车头聊天信息的托盘弹出通知", ref P.Config.TrayNotification);
+								})
+						.Section("触发器")
+						.Widget(() =>
 						{
-								ImGui.Checkbox("接收到带有坐标的车头聊天信息后执行宏命令", ref P.Config.ExecuteMacroOnFlag); // Execute macro after receiving conductor's message with flag
+								ImGui.Checkbox("接收到带有坐标的车头聊天信息后执行宏命令", ref P.Config.ExecuteMacroOnFlag);
 								if(P.Config.ExecuteMacroOnFlag)
 								{
 										ImGui.Indent();
 										var m = RaptureMacroModule.Instance();
-										var macroName = "无"; // Not set
+										var macroName = "无";
 										if(P.Config.MacroIndex >= 0 && P.Config.MacroIndex < m->Shared.Length)
 										{
 												var macro = m->Shared[P.Config.MacroIndex];
@@ -95,7 +96,7 @@ public unsafe class TabSettings
 														macroName = MemoryHelper.ReadSeString(&macro.Name).ToString();
 												}
 										}
-										if(ImGui.BeginCombo("选择用户宏指令", macroName, ImGuiComboFlags.HeightLarge)) // Select System Macro
+										if(ImGui.BeginCombo("选择用户宏指令", macroName, ImGuiComboFlags.HeightLarge))
 										{
 												for(int i = 0; i < m->Shared.Length; i++)
 												{

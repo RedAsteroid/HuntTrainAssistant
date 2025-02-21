@@ -31,7 +31,7 @@ public class ContextMenuManager : IDisposable
 
 				MenuItemAddConductor = new MenuItem()
 				{
-						Name = new SeStringBuilder().AddUiForeground("添加为车头", 578).Build(), // Add as conductor
+						Name = new SeStringBuilder().AddUiForeground("添加为车头", 578).Build(),
 						Prefix = Dalamud.Game.Text.SeIconChar.BoxedLetterH,
 						PrefixColor = 578,
 						OnClicked = AssignConductor,
@@ -46,8 +46,8 @@ public class ContextMenuManager : IDisposable
 						&& args.Target is MenuTargetDefault mt 
 						&& mt.TargetName != null
 						&& ValidAddons.Contains(args.AddonName) 
-						&& mt.TargetHomeWorld.GameData != null
-						&& ExcelWorldHelper.GetPublicWorlds().Any(x => x.RowId == mt.TargetHomeWorld.Id)
+						&& mt.TargetHomeWorld.IsValid
+						&& ExcelWorldHelper.GetPublicWorlds().Any(x => x.RowId == mt.TargetHomeWorld.RowId)
 						)
 				{
 						args.AddMenuItem(MenuItemAddConductor);

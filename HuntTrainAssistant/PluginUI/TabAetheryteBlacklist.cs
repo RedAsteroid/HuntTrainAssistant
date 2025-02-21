@@ -1,4 +1,4 @@
-﻿using Lumina.Excel.GeneratedSheets;
+﻿using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +14,11 @@ public class TabAetheryteBlacklist
 
 		public void Draw()
 		{
-				ImGuiEx.Text($"这些以太之光将被忽略"); // These aetherytes will always be ignored
+				ImGuiEx.Text($"这些以太之光将被忽略");
 				ImGui.SetNextItemWidth(200f);
-				ImGui.InputTextWithHint("##fltr", "搜索", ref Filter, 100); // Search
+				ImGui.InputTextWithHint("##fltr", "搜索", ref Filter, 100);
 				ImGui.SameLine();
-				ImGui.Checkbox("仅显示选定的以太之光", ref OnlySel); // Only selected
+				ImGui.Checkbox("仅显示选定的以太之光", ref OnlySel);
 				foreach(var x in Svc.Data.GetExcelSheet<Aetheryte>())
 				{
 						var name = x.PlaceName.Value.Name.ExtractText();

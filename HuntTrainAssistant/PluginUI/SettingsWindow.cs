@@ -16,7 +16,7 @@ public unsafe class SettingsWindow : ConfigWindow
 
 		private SettingsWindow() : base()
 		{
-				this.WindowName = "HuntTrainAssistant 设置"; // HuntTrainAssistant Configuration
+				this.WindowName = "HuntTrainAssistant 设置";
 				EzConfigGui.WindowSystem.AddWindow(this);
 		}
 
@@ -24,11 +24,11 @@ public unsafe class SettingsWindow : ConfigWindow
 		{
 				PatreonBanner.DrawRight();
 				ImGuiEx.EzTabBar("Bar", PatreonBanner.Text,
-            ("设置", TabSettings.Draw, null, true), // Settings
-            ("联动", S.TabIntegrations.Draw, null, true), // Integrations
-            ("以太之光黑名单", S.TabAetheryteBlacklist.Draw, null, true), // Aetheryte Blacklist
-            ("Debug", TabDebug.Draw, ImGuiColors.DalamudGrey3, true),
-						("Log", InternalLog.PrintImgui, ImGuiColors.DalamudGrey3, false)
-						);
+					("设置", TabSettings.Draw, null, true),
+					("联动", S.TabIntegrations.Draw, null, true),
+					("以太之光黑名单", S.TabAetheryteBlacklist.Draw, null, true),
+					("Debug", TabDebug.Draw, ImGuiColors.DalamudGrey3, true),
+					("Log", InternalLog.PrintImgui, ImGuiColors.DalamudGrey3, false)
+					);
 		}
 }

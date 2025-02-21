@@ -14,17 +14,17 @@ public static unsafe class TaskCreateHuntPF
         P.TaskManager.Abort();
         if(!Player.Available)
         {
-            Notify.Error("现在不能这么做"); // Can't do that now
+            Notify.Error("现在不能这么做");
             return;
         }
-        if(Player.Object.OnlineStatus.Id == 26)
+        if(Player.Object.OnlineStatus.RowId == 26)
         {
-            Notify.Error("已经在招募队员！"); // Already recruiting!
+            Notify.Error("已经在招募队员！");
             return;
         }
         if(!QuestManager.IsQuestComplete(67099) && !QuestManager.IsQuestComplete(67100) && !QuestManager.IsQuestComplete(67101))
         {
-            DuoLog.Error($"怪物狩猎还未解锁，无法创建队员招募。"); // Hunt is not unlocked. Can not create party finder.
+            DuoLog.Error($"怪物狩猎还未解锁，无法创建队员招募。");
             return;
         }
         var cfg = new TaskManagerConfiguration(timeLimitMS: 2000);
@@ -77,7 +77,7 @@ public static unsafe class TaskCreateHuntPF
         }, cfg);
         P.TaskManager.Enqueue(() =>
         {
-            if(Player.Object.OnlineStatus.Id == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
+            if(Player.OnlineStatus == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
             {
                 Chat.Instance.ExecuteCommand("/pfinder");
                 return true;
@@ -86,6 +86,7 @@ public static unsafe class TaskCreateHuntPF
         }, new(timeLimitMS:5000));
     }
 
+    // command mode
     public static void Enqueue2()
     {
         P.TaskManager.Abort();
@@ -94,7 +95,7 @@ public static unsafe class TaskCreateHuntPF
             Notify.Error("现在不能这么做"); // Can't do that now
             return;
         }
-        if (Player.Object.OnlineStatus.Id == 26)
+        if (Player.Object.OnlineStatus.RowId == 26)
         {
             Notify.Error("已经在招募队员！"); // Already recruiting!
             return;
@@ -154,7 +155,7 @@ public static unsafe class TaskCreateHuntPF
         }, cfg);
         P.TaskManager.Enqueue(() =>
         {
-            if (Player.Object.OnlineStatus.Id == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
+            if (Player.Object.OnlineStatus.RowId == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
             {
                 Chat.Instance.ExecuteCommand("/pfinder");
                 Chat.Instance.ExecuteCommand($"/e 已完成创建怪物狩猎招募");
@@ -165,5 +166,4 @@ public static unsafe class TaskCreateHuntPF
             return false;
         }, new(timeLimitMS: 5000));
     }
-
 }

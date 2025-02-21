@@ -14,40 +14,40 @@ public class TabIntegrations
     public void Draw()
     {
         new NuiBuilder()
-        .Section("插件") // Plugins
+        .Section("插件")
         .Widget(() =>
         {
-            ImGui.Checkbox("启用 Sonar 联动", ref P.Config.SonarIntegration); // Enable Sonar integration
+            ImGui.Checkbox("启用 Sonar 联动", ref P.Config.SonarIntegration);
             ImGuiEx.PluginAvailabilityIndicator([new("SonarPlugin", "Sonar")]);
             ImGui.Indent();
-            ImGuiEx.TextWrapped("检测到聊天中的 Sonar 狩猎标记通知时，自动传送到目标服务器与地图"); // When a hunt mark announced in chat, automatically teleport to the target world and zone
-            ImGui.Checkbox("在聊天信息中添加点击传送按钮", ref P.Config.AutoVisitModifyChat); // Add click to teleport link into chat message
-            ImGui.Checkbox("在传送后切换副本区", ref P.Config.EnableSonarInstanceSwitching); // Change instance after teleporting
+            ImGuiEx.TextWrapped("检测到聊天中的 Sonar 狩猎标记通知时，自动传送到目标服务器与地图");
+            ImGui.Checkbox("在聊天信息中添加点击传送按钮", ref P.Config.AutoVisitModifyChat);
+            ImGui.Checkbox("在传送后切换副本区", ref P.Config.EnableSonarInstanceSwitching);
             ImGui.Unindent();
             ImGui.Separator();
-            ImGui.Checkbox("启用 HuntAlerts 联动", ref P.Config.HuntAlertsIntegration); // Enable HuntAlerts integration
+            ImGui.Checkbox("启用 HuntAlerts 联动", ref P.Config.HuntAlertsIntegration);
             ImGuiEx.PluginAvailabilityIndicator([new("HuntAlerts", new Version("1.2.1.3"))]);
-            ImGuiEx.TextWrapped("接收到服务器发送的狩猎标记时，自动传送到目标服务器与地图"); // When a hunt mark notification is received from server, automatically teleport to the target world and zone
+            ImGuiEx.TextWrapped("接收到服务器发送的狩猎标记时，自动传送到目标服务器与地图");
         })
 
-        .Section("通用设置") // Common Settings
+        .Section("通用设置")
         .Widget(() =>
         {
-            ImGuiEx.TextWrapped($"以下为所有插件联动的通用选项"); // These options are common for all integrations
+            ImGuiEx.TextWrapped($"以下为所有插件联动的通用选项");
             ImGui.Separator();
-            ImGui.Checkbox($"接收到通知时，自动传送到最近的以太之光", ref P.Config.AutoVisitTeleportEnabled); // Teleport to nearest aetheryte upon receiving announcement
+            ImGui.Checkbox($"接收到通知时，自动传送到最近的以太之光", ref P.Config.AutoVisitTeleportEnabled);
             ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter")]);
             ImGuiEx.PluginAvailabilityIndicator([new("Lifestream")]);
-            ImGui.Checkbox("允许跨界传送", ref P.Config.AutoVisitCrossWorld); // Allow cross-world teleports
+            ImGui.Checkbox("允许跨界传送", ref P.Config.AutoVisitCrossWorld);
             ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream")]);
             ImGuiEx.PluginAvailabilityIndicator([new("Lifestream")]);
-            ImGui.Checkbox("允许超域传送", ref P.Config.AutoVisitCrossDC); // Allow cross-datacenter teleports
+            ImGui.Checkbox("允许超域传送", ref P.Config.AutoVisitCrossDC);
             ImGuiEx.PluginAvailabilityIndicator([new("TeleporterPlugin", "Teleporter"), new("Lifestream")]);
             ImGuiEx.PluginAvailabilityIndicator([new("Lifestream")]);
             ImGuiEx.TreeNodeCollapsingHeader($"黑名单服务器 (当前有 {P.Config.WorldBlacklist.Count} 个在黑名单)###blworlds", DrawWorldBlacklist);
         })
 
-        .Section("触发过滤") // Trigger Filters
+        .Section("触发过滤")
         .Widget(() =>
         {
             foreach(var rank in Enum.GetValues<Rank>())
@@ -76,8 +76,8 @@ public class TabIntegrations
 
     void DrawWorldBlacklist()
     {
-        ImGuiEx.TextWrapped($"以下所选的服务器不会启用自动传送，但是您仍然可以点击聊天中的传送链接手动前往。"); // Auto-teleport will not be engaged to the worlds selected below. You can still use chat link to get to them manually.
-        foreach (var r in Enum.GetValues<ExcelWorldHelper.Region>())
+        ImGuiEx.TextWrapped($"以下所选的服务器不会启用自动传送，但是您仍然可以点击聊天中的传送链接手动前往。");
+        foreach(var r in Enum.GetValues<ExcelWorldHelper.Region>())
         {
             ImGuiEx.CollectionCheckbox($"地区 {r}", ExcelWorldHelper.GetPublicWorlds(r).Select(x => x.RowId), P.Config.WorldBlacklist);
             ImGui.Indent();
