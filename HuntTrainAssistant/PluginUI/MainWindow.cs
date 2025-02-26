@@ -78,7 +78,7 @@ public unsafe class MainWindow : ConfigWindow
 				if (P.TeleportTo == null)
 				{
 						ImGuiEx.Text("自动传送: 未激活");
-						if (ChatMessageHandler.LastMessageLoc != null && ImGui.Button($"Autoteleport to {ChatMessageHandler.LastMessageLoc.Aetheryte.PlaceName.Value.Name}"))
+						if (ChatMessageHandler.LastMessageLoc != null && ImGui.Button($"自动传送到 → {ChatMessageHandler.LastMessageLoc.Aetheryte.PlaceName.Value.Name}"))
 						{
 							P.TeleportTo = ChatMessageHandler.LastMessageLoc;
 						}
