@@ -1,10 +1,9 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using ECommons.Automation.NeoTaskManager;
 using ECommons.Configuration;
+using ECommons.Events;
 using ECommons.EzIpcManager;
-using ECommons.GameFunctions;
 using ECommons.GameHelpers;
-using ECommons.Reflection;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
 using ECommons.Throttlers;
@@ -72,7 +71,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     {
         if(P.Config.Debug)
         {
-            if(EzThrottler.Throttle("InformDebug", 600000)) DuoLog.Warning("您正在使用 HuntTrainAssistant 的 Debug 模式，这会破坏插件的功能。请在您不需要调试时禁用 Debug 模式。");
+            if(EzThrottler.Throttle("InformDebug", 600000)) DuoLog.Warning("You are using debug mode in HuntTrainAssistant which will break functions of the plugin. Please disable debug mode once you don't need it.");
         }
         if(LastInstance != UIState.Instance()->PublicInstance.InstanceId)
         {
@@ -94,6 +93,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         }
         if (Player.Interactable && TeleportTo?.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
         {
+            if(Utils.CheckMultiMode()) return;
             if (IsScreenReady())
             {
                 if (Svc.ClientState.LocalPlayer.IsCasting)
@@ -120,7 +120,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                 }
                 if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting] && !IsMoving)
                 {
-                    if (EzThrottler.Throttle("Teleport") && !Player.IsAnimationLocked)
+                    if (EzThrottler.Throttle("Teleport")) && !Player.IsAnimationLocked)
                     {
                         if (S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0))
                         {
@@ -144,6 +144,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         {
             if((TeleportTo?.Instance ?? 0) > 0)
             {
+                if(Utils.CheckMultiMode()) return;
                 TaskChangeInstanceAfterTeleport.Enqueue(TeleportTo.Instance, (int)TeleportTo.Aetheryte.Territory.RowId);
             }
             TeleportTo = default;

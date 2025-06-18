@@ -39,11 +39,13 @@ internal unsafe static class ChatMessageHandler
                                 if(m.TerritoryType.RowId != Svc.ClientState.TerritoryType)
                                 {
                                     P.TeleportTo = ArrivalData.CreateOrNull(nearestAetheryte, m.TerritoryType.RowId, P.Config.AutoSwitchInstanceToOne?1:0);
+                                    Utils.DelayTeleport();
                                     Notify.Info("正在激活自动传送");
                                 }
                                 else if(Utils.CanAutoInstanceSwitch() && P.Config.AutoSwitchInstanceTwoRanks && S.LifestreamIPC.GetCurrentInstance() < S.LifestreamIPC.GetNumberOfInstances())
                                 {
                                     P.TeleportTo = ArrivalData.CreateOrNull(nearestAetheryte, m.TerritoryType.RowId, S.LifestreamIPC.GetCurrentInstance() + 1);
+                                    Utils.DelayTeleport();
                                     PluginLog.Debug($"Auto-teleporting because of two A ranks killed ({P.KilledARanks.Print()})");
                                     Notify.Info("正在激活自动传送(切换分线)");
                                 }
@@ -51,7 +53,7 @@ internal unsafe static class ChatMessageHandler
                             if (P.Config.AutoOpenMap)
                             {
                                 var flag = AgentMap.Instance()->FlagMapMarker;
-                                if (AgentMap.Instance()->IsFlagMarkerSet != 0 && flag.TerritoryId == m.TerritoryType.RowId)
+                                if (AgentMap.Instance()->IsFlagMarkerSet != false && flag.TerritoryId == m.TerritoryType.RowId)
                                 {
                                     if (Svc.Data.GetExcelSheet<Map>().TryGetFirst(x => x.TerritoryType.RowId == m.TerritoryType.RowId, out var place))
                                     {
@@ -105,7 +107,7 @@ internal unsafe static class ChatMessageHandler
                 {
                     if(P.Config.TrayNotification)
                     {
-                        S.Notificator.DisplayTrayNotification("[HTA] Conductor's message", message.ExtractText());
+                        S.Notificator.DisplayTrayNotification("[HTA] Conductor's message", message.GetText());
                     }
                     if(P.Config.FlashTaskbar)
                     {

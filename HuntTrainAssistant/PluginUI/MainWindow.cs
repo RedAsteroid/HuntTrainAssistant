@@ -1,6 +1,5 @@
 ﻿using ECommons.ImGuiMethods;
 using ECommons.SimpleGui;
-using HuntTrainAssistant.Tasks;
 using System.Runtime.Intrinsics.X86;
 
 namespace HuntTrainAssistant.PluginUI;

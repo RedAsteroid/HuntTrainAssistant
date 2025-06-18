@@ -28,10 +28,10 @@ public unsafe class TabSettings
 								ImGui.SameLine();
 								ImGui.Checkbox("Debug 模式", ref P.Config.Debug);
 								ImGui.Checkbox("自动传送到不同的地图", ref P.Config.AutoTeleport);
-								ImGui.Indent();
-								ImGui.Checkbox("在传送后自动切换到号副本区", ref P.Config.AutoSwitchInstanceToOne);
-								ImGui.Unindent();
-								ImGui.Checkbox("检测到新的旗帜标记后自动打开地图", ref P.Config.AutoOpenMap);
+                ImGui.Indent();
+                ImGui.Checkbox("在传送后自动切换到号副本区", ref P.Config.AutoSwitchInstanceToOne);
+                ImGui.Unindent();
+                ImGui.Checkbox("检测到新的旗帜标记后自动打开地图", ref P.Config.AutoOpenMap);
 								ImGui.Indent();
 								ImGui.Checkbox("禁止在上一个标记位置相同时重复打开地图", ref P.Config.NoDuplicateFlags);
 								ImGui.Unindent();
@@ -41,12 +41,18 @@ public unsafe class TabSettings
 								ImGui.Checkbox("添加右键菜单选项", ref P.Config.ContextMenu);
 								ImGui.Checkbox("启用 一键创建队员招募按钮", ref P.Config.PfinderEnable);
 								ImGui.Checkbox("显示 记录A怪击杀信息在主窗口", ref P.Config.ShowKilledARanks);
-
 								ImGui.Indent();
 								ImGuiEx.Text($"队员招募自由留言");
 								ImGuiEx.SetNextItemFullWidth();
 								ImGui.InputText($"##pfindercommenr", ref P.Config.PfinderString, 150);
 								ImGui.Unindent();
+								ImGui.Checkbox("启用 自动传送随机延迟", ref P.Config.TeleportDelayEnabled);
+								ImGui.Indent();
+								ImGui.SetNextItemWidth(150f);
+                ImGuiEx.SliderIntAsFloat("最小延迟(ms)", ref P.Config.TeleportDelayMin, 0, 1000);
+                ImGui.SetNextItemWidth(150f);
+                ImGuiEx.SliderIntAsFloat("最大延迟(ms)", ref P.Config.TeleportDelayMax, 0, 1000);
+                ImGui.Unindent();
 						})
 						.Section("通知")
 						.Widget(() =>
@@ -73,12 +79,12 @@ public unsafe class TabSettings
 								ImGui.SetNextItemWidth(150f);
 								ImGui.SliderFloat("音量", ref P.Config.AudioAlertVolume, 0f, 1f);
 								ImGui.Checkbox("只在游戏最小化时播放", ref P.Config.AudioAlertOnlyMinimized);
-								ImGui.SetNextItemWidth(150f);
-								ImGuiEx.SliderIntAsFloat("音频通知的最小间隔时间", ref P.Config.AudioThrottle, 0, 10000);
-								ImGui.Unindent();
-								ImGui.Checkbox("在任务栏闪烁车头的聊天信息", ref P.Config.FlashTaskbar);
+                ImGui.SetNextItemWidth(150f);
+                ImGuiEx.SliderIntAsFloat("音频通知的最小间隔时间", ref P.Config.AudioThrottle, 0, 10000);
+                ImGui.Unindent();
+                ImGui.Checkbox("在任务栏闪烁车头的聊天信息", ref P.Config.FlashTaskbar);
 								ImGui.Checkbox("显示车头聊天信息的托盘弹出通知", ref P.Config.TrayNotification);
-								})
+            })
 						.Section("触发器")
 						.Widget(() =>
 						{
@@ -102,8 +108,8 @@ public unsafe class TabSettings
 												{
 														if(m->Shared[i].IsNotEmpty())
 														{
-																var macro = m->Shared[i];
-																macroName = MemoryHelper.ReadSeString(&macro.Name).ToString();
+                                var macro = m->Shared[i];
+                                macroName = MemoryHelper.ReadSeString(&macro.Name).ToString();
 																if(ImGui.Selectable($"#{i + 1}: {macroName}", i == P.Config.MacroIndex))
 																{
 																		P.Config.MacroIndex = i;
