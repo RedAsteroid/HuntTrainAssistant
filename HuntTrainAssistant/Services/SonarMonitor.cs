@@ -40,9 +40,9 @@ public class SonarMonitor : IDisposable
 		private void OnHuntTrainMessageReceived(HuntTrainMessage message)
 		{
 				try
-        {
-            if(Utils.CheckMultiMode()) return;
-            PluginLog.Debug($"HTM received: {message}");
+				{
+					if(Utils.CheckMultiMode()) return;
+						PluginLog.Debug($"HTM received: {message}");
 						if (P.Config.HuntAlertsIntegration)
 						{
 								var aetheryte = Svc.Data.GetExcelSheet<Aetheryte>(ClientLanguage.English).FirstOrNull(x => x.GetPlaceName() == message.startLocation);
@@ -61,12 +61,12 @@ public class SonarMonitor : IDisposable
 								};
 								var worldId = ExcelWorldHelper.Get(message.huntWorld)?.RowId ?? 0;
 
-                if(!Svc.Condition[ConditionFlag.BoundByDuty] && !Svc.Condition[ConditionFlag.BoundByDuty56] && !Svc.Condition[ConditionFlag.InDutyQueue] && (!P.Config.WorldBlacklist.Contains(worldId) || Player.CurrentWorldId == worldId))
+								if(!Svc.Condition[ConditionFlag.BoundByDuty] && !Svc.Condition[ConditionFlag.BoundByDuty56] && !Svc.Condition[ConditionFlag.InDutyQueue] && (!P.Config.WorldBlacklist.Contains(worldId) || Player.CurrentWorldId == worldId))
 								{
 										HandleAutoTeleport(message.huntWorld, aetheryte.Value, payload, false, rank, ParseExpansion(payload), message.instance);
 								}
 						}
-        }
+				}
 				catch(Exception ex)
 				{
 						ex.Log();
@@ -75,18 +75,18 @@ public class SonarMonitor : IDisposable
 		}
 
 		private void ContinueTeleport()
-    {
-        if(Continuation != null)
-        {
+		{
+			if(Continuation != null)
+			{
             if(Utils.CheckMultiMode()) return;
             if (Player.Interactable && IsScreenReady() && Player.CurrentWorld == Continuation.World)
-						{
-								P.TeleportTo = Continuation;
-								EzConfigGui.Window.IsOpen = true;
-								Continuation = null;
-						}
-						EzConfigGui.Window.IsOpen = true;
-				}
+					{
+							P.TeleportTo = Continuation;
+							EzConfigGui.Window.IsOpen = true;
+							Continuation = null;
+					}
+					EzConfigGui.Window.IsOpen = true;
+			}
 		}
 
 		public void Dispose()
@@ -120,19 +120,19 @@ public class SonarMonitor : IDisposable
 		}
 
 		public void HandleAutoTeleport(string world, Aetheryte aetheryte, MapLinkPayload payload, bool force, Rank rank, Expansion ex, int instance)
-    {
-        if(Utils.CheckMultiMode()) return;
-        if (!Player.Interactable) return;
+		{
+			if(Utils.CheckMultiMode()) return;
+			if (!Player.Interactable) return;
 				if (Utils.IsInHuntingTerritory() && !force) return;
 				if (S.LifestreamIPC.IsBusy()) return;
 				if (Continuation != null) return;
-        if (!force && P.Config.AutoVisitExpansionsBlacklist.TryGetValue(rank, out var exList) && exList.Contains(ex))
-				{
+			if (!force && P.Config.AutoVisitExpansionsBlacklist.TryGetValue(rank, out var exList) && exList.Contains(ex))
+			{
 						PluginLog.Debug($"{rank}/{ex} is blacklisted, skipping");
 						return;
-				}
-        if (force || P.Config.AutoVisitTeleportEnabled)
-				{
+			}
+			if (force || P.Config.AutoVisitTeleportEnabled)
+			{
 						if (Player.CurrentWorld == world)
 						{
 								DuoLog.Information($"服务器内传送: {world}");
@@ -159,11 +159,11 @@ public class SonarMonitor : IDisposable
 										{
 												S.LifestreamIPC.TPAndChangeWorld(world, true, null, true, null, false, false);
 												if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
-                        Continuation = new(aetheryte, aetheryte.Territory.RowId, instance)
-                        {
-                            World = world,
-                        };
-                        DuoLog.Information($"超域传送: {world}");
+												Continuation = new(aetheryte, aetheryte.Territory.RowId, instance)
+												{
+												World = world,
+												};
+												DuoLog.Information($"超域传送: {world}");
 												EzConfigGui.Window.IsOpen = true;
 										}
 										else
@@ -172,13 +172,13 @@ public class SonarMonitor : IDisposable
 										}
 								}
 						}
-				}
+			}
 		}
 
 		private void Chat_ChatMessage(XivChatType type, int a2, ref SeString sender, ref SeString message, ref bool isHandled)
-    {
-        if(Utils.CheckMultiMode()) return;
-        if (P.Config.SonarIntegration && sender.ToString() == "Sonar")
+		{
+				if(Utils.CheckMultiMode()) return;
+				if (P.Config.SonarIntegration && sender.ToString() == "Sonar")
 				{
 						var messageText = message.GetText().Replace("", "");
 						if (messageText.Contains("killed")) return;

@@ -35,7 +35,7 @@ public static class Utils
 						P.Config.AutoVisitTeleportEnabled = false;
 						P.TeleportTo = null;
 						return true;
-        }
+				}
 				else
 				{
 						return false;

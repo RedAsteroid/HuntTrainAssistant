@@ -71,7 +71,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     {
         if(P.Config.Debug)
         {
-            if(EzThrottler.Throttle("InformDebug", 600000)) DuoLog.Warning("You are using debug mode in HuntTrainAssistant which will break functions of the plugin. Please disable debug mode once you don't need it.");
+            if(EzThrottler.Throttle("InformDebug", 600000)) DuoLog.Warning("您正在使用 HuntTrainAssistant 的 Debug 模式，这会破坏插件的功能。请在您不需要调试时禁用 Debug 模式。");
         }
         if(LastInstance != UIState.Instance()->PublicInstance.InstanceId)
         {
@@ -120,7 +120,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                 }
                 if (!Svc.Condition[ConditionFlag.InCombat] && !Svc.Condition[ConditionFlag.BetweenAreas] && !Svc.Condition[ConditionFlag.BetweenAreas51] && !Svc.Condition[ConditionFlag.Casting] && !IsMoving)
                 {
-                    if (EzThrottler.Throttle("Teleport")) && !Player.IsAnimationLocked)
+                    if (EzThrottler.Throttle("Teleport") && !Player.IsAnimationLocked)
                     {
                         if (S.TeleporterIPC.Teleport(TeleportTo.Aetheryte.RowId, 0))
                         {
