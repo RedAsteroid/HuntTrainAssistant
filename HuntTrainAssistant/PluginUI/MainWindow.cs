@@ -1,4 +1,5 @@
-﻿using ECommons.ImGuiMethods;
+﻿using Dalamud.Interface.Style;
+using ECommons.ImGuiMethods;
 using ECommons.SimpleGui;
 using System.Runtime.Intrinsics.X86;
 using HuntTrainAssistant.Tasks;
@@ -77,7 +78,7 @@ public unsafe class MainWindow : ConfigWindow
 
 				if (P.TeleportTo == null)
 				{
-						ImGuiEx.Text("自动传送: 未激活");
+						ImGuiEx.Text(ImGuiColors.DalamudGrey3, "自动传送: 未激活");
 						if (ChatMessageHandler.LastMessageLoc != null && ImGui.Button($"自动传送到 → {ChatMessageHandler.LastMessageLoc.Aetheryte.PlaceName.Value.Name}"))
 						{
 							P.TeleportTo = ChatMessageHandler.LastMessageLoc;
@@ -89,9 +90,23 @@ public unsafe class MainWindow : ConfigWindow
 						ImGui.SameLine();
 						if (ImGui.SmallButton("取消"))
 						{
-								P.TeleportTo = null;
+						PluginLog.Debug($"TeleportTo reset (3)");
+						P.TeleportTo = null;
 						}
 						ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory.GetTerritoryName()} i{P.TeleportTo.Instance}");
+				}
+				if(P.TaskManager.IsBusy)
+				{
+						ImGuiEx.Text($"{P.TaskManager.NumQueuedTasks:D2} 任务进行中");
+						ImGui.SameLine();
+						if(ImGui.SmallButton("停止##tm"))
+						{
+							P.TaskManager.Abort();
+						}
+				}
+				else
+				{
+						ImGuiEx.Text(ImGuiColors.DalamudGrey3, $"Task manager: 未激活");
 				}
 				ImGui.Checkbox($"Sonar 自动传送", ref P.Config.AutoVisitTeleportEnabled);
 				if (P.Config.AutoVisitTeleportEnabled)
