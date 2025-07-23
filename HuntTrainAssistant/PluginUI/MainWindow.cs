@@ -97,7 +97,7 @@ public unsafe class MainWindow : ConfigWindow
 				}
 				if(P.TaskManager.IsBusy)
 				{
-						ImGuiEx.Text($"{P.TaskManager.NumQueuedTasks:D2} 任务进行中");
+						ImGuiEx.Text($"{P.TaskManager.NumQueuedTasks:D2} 个任务进行中");
 						ImGui.SameLine();
 						if(ImGui.SmallButton("停止##tm"))
 						{

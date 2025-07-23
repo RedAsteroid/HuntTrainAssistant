@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace HuntTrainAssistant.PluginUI;
 public unsafe class TabSettings
 {
-    Dictionary<int, string> Mounts = [new KeyValuePair<int, string>(0, "Mount roulette"), .. Svc.Data.GetExcelSheet<Mount>().Where(x => x.Singular != "").ToDictionary(x => (int)x.RowId, x => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(x.Singular.GetText()))];
+    Dictionary<int, string> Mounts = [new KeyValuePair<int, string>(0, "随机坐骑"), .. Svc.Data.GetExcelSheet<Mount>().Where(x => x.Singular != "").ToDictionary(x => (int)x.RowId, x => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(x.Singular.GetText()))];
     public void Draw()
 		{
 				if(OpenFileDialog.IsSelecting())
@@ -31,18 +31,18 @@ public unsafe class TabSettings
 								ImGui.SameLine();
 								ImGui.Checkbox("Debug 模式", ref P.Config.Debug);
 								ImGui.Checkbox("自动传送到不同的地图", ref P.Config.AutoTeleport);
-                ImGui.Indent();
-                ImGui.Checkbox("在传送后自动切换到号副本区", ref P.Config.AutoSwitchInstanceToOne);
+								ImGui.Indent();
+								ImGui.Checkbox("在传送后自动切换到号副本区", ref P.Config.AutoSwitchInstanceToOne);
 								ImGui.Checkbox("传送到目的地后自动上坐骑", ref P.Config.UseMount);
 								if(P.Config.UseMount)
 								{
 										ImGui.Indent();
-                    ImGui.SetNextItemWidth(200f);
-                    ImGuiEx.Combo("首选坐骑", ref P.Config.Mount, Mounts.Keys, names: Mounts);
-                    ImGui.Unindent();
+										ImGui.SetNextItemWidth(200f);
+										ImGuiEx.Combo("首选坐骑", ref P.Config.Mount, Mounts.Keys, names: Mounts);
+										ImGui.Unindent();
 								}
-                ImGui.Unindent();
-                ImGui.Checkbox("检测到新的旗帜标记后自动打开地图", ref P.Config.AutoOpenMap);
+								ImGui.Unindent();
+								ImGui.Checkbox("检测到新的旗帜标记后自动打开地图", ref P.Config.AutoOpenMap);
 								ImGui.Indent();
 								ImGui.Checkbox("禁止在上一个标记位置相同时重复打开地图", ref P.Config.NoDuplicateFlags);
 								ImGui.Unindent();
