@@ -60,9 +60,9 @@ public unsafe class TabSettings
 								ImGui.Checkbox("启用 自动传送随机延迟", ref P.Config.TeleportDelayEnabled);
 								ImGui.Indent();
 								ImGui.SetNextItemWidth(150f);
-								ImGuiEx.SliderIntAsFloat("最小延迟(ms)", ref P.Config.TeleportDelayMin, 0, 1000);
+								ImGuiEx.SliderIntAsFloat("最小延迟(s)", ref P.Config.TeleportDelayMin, 0, 1000);
 								ImGui.SetNextItemWidth(150f);
-								ImGuiEx.SliderIntAsFloat("最大延迟(ms)", ref P.Config.TeleportDelayMax, 0, 1000);
+								ImGuiEx.SliderIntAsFloat("最大延迟(s)", ref P.Config.TeleportDelayMax, 0, 1000);
 								ImGui.Unindent();
 						})
 						.Section("通知")
