@@ -15,9 +15,18 @@ using UIColor = ECommons.ChatMethods.UIColor;
 namespace HuntTrainAssistant.Services;
 public class SonarMonitor : IDisposable
 {
-		private OrderedDictionary<Guid, PayloadInfo> Payloads = [];
+		private static uint _nextCommandId = 1;
+		private OrderedDictionary<uint, PayloadInfo> Payloads = [];
 		public ArrivalData Continuation = null;
 		public string[] InstanceNumbers = ["", "", ""];
+
+		// 计数器还原
+		private static uint GetNextCommandId()
+		{
+			if (_nextCommandId == uint.MaxValue)
+				_nextCommandId = 1;
+			return _nextCommandId++;
+		}
 
 		private SonarMonitor()
 		{
@@ -97,7 +106,8 @@ public class SonarMonitor : IDisposable
 
 		private PayloadInfo CreateLinkPayload(string world, Aetheryte aetheryte, MapLinkPayload link, int instance)
 		{
-				var payload = Svc.Chat.AddChatLinkHandler(HandleLinkPayload);
+				uint commandId = GetNextCommandId();
+				var payload = Svc.Chat.AddChatLinkHandler(commandId,HandleLinkPayload);
 				var info = (payload, world, aetheryte, link, instance);
 				Payloads[payload.CommandId] = info;
 				PluginLog.Information($"Created payload {info}");
@@ -110,7 +120,7 @@ public class SonarMonitor : IDisposable
 				return info;
 		}
 
-		private void HandleLinkPayload(Guid commandId, SeString message)
+		private void HandleLinkPayload(uint commandId, SeString message)
 		{
 				if(Payloads.TryGetValue(commandId, out var info))
 				{
@@ -251,5 +261,5 @@ public class SonarMonitor : IDisposable
         if (bg.StartsWith("ex4")) return Expansion.晓月之终途;
         if (bg.StartsWith("ex5")) return Expansion.金曦之遗辉;
         return Expansion.重生之境;
-    }
+		}
 }
