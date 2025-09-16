@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>NightmareXIV</Authors>
-		<Version>1.0.2.7</Version>
+		<Version>1.0.2.8</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -23,7 +23,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
+		<DalamudLibPath>$(appdata)\XIVLauncherCN\addon\Hooks\dev\</DalamudLibPath>
 	</PropertyGroup>
     
 	<ItemGroup>
