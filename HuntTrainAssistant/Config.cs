@@ -45,5 +45,6 @@ public class Config : IEzConfig
     public int TeleportDelayMax = 700;
     public bool ShowKilledARanks = true;
     public bool UseMount = true;
+    public bool UseDRWorldTravelCommand = true;
     public int Mount = 0;
 }

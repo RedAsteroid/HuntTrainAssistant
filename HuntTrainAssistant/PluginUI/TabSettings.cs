@@ -69,8 +69,8 @@ public unsafe class TabSettings
 						.Widget(() =>
 						{
 								ImGuiEx.Text("需要安装 NotificationMaster 插件");
-								ImGuiEx.PluginAvailabilityIndicator([new("NotificationMaster"), new("NotificationMaster.NXIV", "NotificationMaster (from NightmareXIV repo)")],"需要安装并启用以下插件之一", false); // explicit override
-                            ImGui.Checkbox("车头发送信息时，播放音频", ref P.Config.AudioAlert);
+								ImGuiEx.PluginAvailabilityIndicator([new("NotificationMaster"), new("NotificationMaster.NXIV", "NotificationMaster (from NightmareXIV repo)")],"需要安装并启用以下插件之一:", false); // explicit override
+								ImGui.Checkbox("车头发送信息时，播放音频", ref P.Config.AudioAlert);
 								ImGui.Indent();
 								ImGuiEx.InputWithRightButtonsArea(() => ImGui.InputTextWithHint("##pathToAudio", "音频文件路径", ref P.Config.AudioAlertPath, 500), () =>
 								{

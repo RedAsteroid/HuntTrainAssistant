@@ -23,6 +23,9 @@ public class TabIntegrations
             ImGuiEx.TextWrapped("检测到聊天中的 Sonar 狩猎标记通知时，自动传送到目标服务器与地图");
             ImGui.Checkbox("在聊天信息中添加点击传送按钮", ref P.Config.AutoVisitModifyChat);
             ImGui.Checkbox("在传送后切换副本区", ref P.Config.EnableSonarInstanceSwitching);
+            ImGui.Checkbox("使用 快捷跨界传送指令(Daily Routines) 进行跨界传送", ref P.Config.UseDRWorldTravelCommand);
+            ImGuiEx.PluginAvailabilityIndicator([new("DailyRoutines")]);
+            ImGuiEx.PluginAvailabilityIndicator([new("DCTraveler", "DCTraveler"), new("DCTravelerX", "DCTravelerX")], "需要安装并启用以下插件之一:", false);
             ImGui.Unindent();
             ImGui.Separator();
             ImGui.Checkbox("启用 HuntAlerts 联动", ref P.Config.HuntAlertsIntegration);

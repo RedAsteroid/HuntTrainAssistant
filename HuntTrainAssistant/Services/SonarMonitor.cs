@@ -2,6 +2,7 @@
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
+using ECommons.Automation;
 using ECommons.ExcelServices;
 using ECommons.EzEventManager;
 using ECommons.EzIpcManager;
@@ -166,18 +167,33 @@ public class SonarMonitor : IDisposable
 										}
 										else if ((force || P.Config.AutoVisitCrossDC) && S.LifestreamIPC.CanVisitCrossDC(world))
 										{
+											if(!P.Config.UseDRWorldTravelCommand)
+											{
 												S.LifestreamIPC.TPAndChangeWorld(world, true, null, true, null, false, false);
 												if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
 												Continuation = new(aetheryte, aetheryte.Territory.RowId, instance)
 												{
-												World = world,
+													World = world,
 												};
 												DuoLog.Information($"超域传送: {world}");
 												EzConfigGui.Window.IsOpen = true;
+
+											}
+											else if (P.Config.UseDRWorldTravelCommand)
+											{
+												Chat.ExecuteCommand($"/pdr worldtravel {world}");
+												if (payload != null) Svc.GameGui.OpenMapWithMapLink(payload);
+												Continuation = new(aetheryte, aetheryte.Territory.RowId, instance)
+												{
+													World = world,
+												};
+												DuoLog.Information($"超域传送(DCTravel): {world}");
+												EzConfigGui.Window.IsOpen = true;
+											}
 										}
 										else
 										{
-												DuoLog.Information($"无法传送到服务器: {world}");
+											DuoLog.Information($"无法传送到服务器: {world}");
 										}
 								}
 						}
