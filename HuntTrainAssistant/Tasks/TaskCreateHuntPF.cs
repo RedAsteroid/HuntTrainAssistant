@@ -77,7 +77,7 @@ public static unsafe class TaskCreateHuntPF
         }, cfg);
         P.TaskManager.Enqueue(() =>
         {
-            if(Player.OnlineStatus == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
+            if(Player.OnlineStatus.RowId == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
             {
                 Chat.Instance.ExecuteCommand("/pfinder");
                 return true;

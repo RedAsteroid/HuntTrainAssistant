@@ -58,7 +58,7 @@ public unsafe class TabDebug
 				ImGui.SameLine();
 				if(ImGui.Button("Switch instance"))
 				{
-						TaskChangeInstanceAfterTeleport.Enqueue(inst, (int)Player.Territory);
+						TaskChangeInstanceAfterTeleport.Enqueue(inst, (int)Player.Territory.RowId);
 				}
 				ImGuiEx.Text($"Utils.CanAutoInstanceSwitch: {Utils.CanAutoInstanceSwitch()}");
 				ImGuiEx.Text($"Killed mobs: {P.KilledARanks.Print(",")}");

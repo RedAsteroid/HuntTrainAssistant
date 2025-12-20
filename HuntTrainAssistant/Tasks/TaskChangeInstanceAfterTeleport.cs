@@ -1,4 +1,5 @@
 ﻿using ECommons.Automation;
+using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
 using ECommons.Throttlers;
@@ -15,7 +16,7 @@ public static class TaskChangeInstanceAfterTeleport
 {
     public static void Enqueue(Number num, Number territory)
     {
-        P.TaskManager.Enqueue(() => Player.Territory == territory && Player.Interactable);
+        P.TaskManager.Enqueue(() => Player.Territory.RowId == territory && Player.Interactable);
         P.TaskManager.Enqueue(() =>
         {
             if(!(S.LifestreamIPC.GetNumberOfInstances() == 0 || num == 0 || S.LifestreamIPC.GetCurrentInstance() == num))

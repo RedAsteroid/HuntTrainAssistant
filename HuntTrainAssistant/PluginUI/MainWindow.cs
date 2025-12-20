@@ -1,8 +1,9 @@
 ﻿using Dalamud.Interface.Style;
 using ECommons.ImGuiMethods;
 using ECommons.SimpleGui;
-using System.Runtime.Intrinsics.X86;
 using HuntTrainAssistant.Tasks;
+using System.Runtime.Intrinsics.X86;
+using static FFXIVClientStructs.FFXIV.Client.Game.UI.Telepo.Delegates;
 
 namespace HuntTrainAssistant.PluginUI;
 
@@ -93,7 +94,10 @@ public unsafe class MainWindow : ConfigWindow
 						PluginLog.Debug($"TeleportTo reset (3)");
 						P.TeleportTo = null;
 						}
-						ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory.GetTerritoryName()} i{P.TeleportTo.Instance}");
+						if (P.TeleportTo != null) // 避免可能的空引用异常
+						{
+							ImGuiEx.Text($"{P.TeleportTo.Aetheryte.GetPlaceName()}@{P.TeleportTo.Territory} i{P.TeleportTo.Instance}");
+						}
 				}
 				if(P.TaskManager.IsBusy)
 				{

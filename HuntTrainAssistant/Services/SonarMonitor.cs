@@ -71,7 +71,7 @@ public class SonarMonitor : IDisposable
 								};
 								var worldId = ExcelWorldHelper.Get(message.huntWorld)?.RowId ?? 0;
 
-								if(!Svc.Condition[ConditionFlag.BoundByDuty] && !Svc.Condition[ConditionFlag.BoundByDuty56] && !Svc.Condition[ConditionFlag.InDutyQueue] && (!P.Config.WorldBlacklist.Contains(worldId) || Player.CurrentWorldId == worldId))
+								if(!Svc.Condition[ConditionFlag.BoundByDuty] && !Svc.Condition[ConditionFlag.BoundByDuty56] && !Svc.Condition[ConditionFlag.InDutyQueue] && (!P.Config.WorldBlacklist.Contains(worldId) || Player.CurrentWorld.RowId == worldId))
 								{
 										HandleAutoTeleport(message.huntWorld, aetheryte.Value, payload, false, rank, ParseExpansion(payload), message.instance);
 								}
@@ -89,7 +89,7 @@ public class SonarMonitor : IDisposable
 			if(Continuation != null)
 			{
             if(Utils.CheckMultiMode()) return;
-            if (Player.Interactable && IsScreenReady() && Player.CurrentWorld == Continuation.World)
+            if (Player.Interactable && IsScreenReady() && Player.CurrentWorld.ToString() == Continuation.World)
 					{
 							P.TeleportTo = Continuation;
 							EzConfigGui.Window.IsOpen = true;
@@ -143,7 +143,7 @@ public class SonarMonitor : IDisposable
 			}
 			if (force || P.Config.AutoVisitTeleportEnabled)
 			{
-						if (Player.CurrentWorld == world)
+						if (Player.CurrentWorld.ToString() == world)
 						{
 								DuoLog.Information($"服务器内传送: {world}");
 								P.TeleportTo = ArrivalData.CreateOrNull(aetheryte, aetheryte.Territory.RowId, instance);
@@ -228,7 +228,7 @@ public class SonarMonitor : IDisposable
 												.Add(RawPayload.LinkTerminator)
 												.Build();
 								}
-								if(world.Value.RowId == Player.CurrentWorldId || !P.Config.WorldBlacklist.Contains(world.Value.RowId))
+								if(world.Value.RowId == Player.CurrentWorld.RowId || !P.Config.WorldBlacklist.Contains(world.Value.RowId))
 								{
 										HandleAutoTeleport(world.Value.Name.ToString(), aetheryte.Value, link, false, rank, ex, ParseInstanceNumber(message.ToString()));
 								}

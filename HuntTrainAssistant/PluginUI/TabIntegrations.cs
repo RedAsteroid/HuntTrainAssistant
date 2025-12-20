@@ -80,7 +80,7 @@ public class TabIntegrations
     void DrawWorldBlacklist()
     {
         ImGuiEx.TextWrapped($"以下所选的服务器不会启用自动传送，但是您仍然可以点击聊天中的传送链接手动前往。");
-        foreach(var r in Enum.GetValues<ExcelWorldHelper.Region>())
+        foreach (var r in Enum.GetValues<ExcelWorldHelper.Region>())
         {
             ImGuiEx.CollectionCheckbox($"地区 {r}", ExcelWorldHelper.GetPublicWorlds(r).Select(x => x.RowId), P.Config.WorldBlacklist);
             ImGui.Indent();

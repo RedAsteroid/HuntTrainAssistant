@@ -2,11 +2,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>NightmareXIV</Authors>
-		<Version>1.0.3.0</Version>
+		<DalamudApiLevel>14</DalamudApiLevel>
+		<Version>1.0.3.1</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFramework>net9.0-windows7.0</TargetFramework>
+		<TargetFramework>net10.0-windows7.0</TargetFramework>
 		<Platforms>x64</Platforms>
 		<LangVersion>preview</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -23,11 +24,11 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<DalamudLibPath>$(appdata)\XIVLauncherCN\addon\Hooks\dev\</DalamudLibPath>
+		<DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
 	</PropertyGroup>
     
 	<ItemGroup>
-	  <PackageReference Include="DalamudPackager" Version="2.1.13" />
+	  <PackageReference Include="DalamudPackager" Version="14.0.1" />
 	  <PackageReference Include="NotificationMasterAPI" Version="1.0.0.1" />
 	</ItemGroup>
     
