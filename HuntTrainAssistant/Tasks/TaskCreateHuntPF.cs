@@ -77,7 +77,7 @@ public static unsafe class TaskCreateHuntPF
         }, cfg);
         P.TaskManager.Enqueue(() =>
         {
-            if(Player.OnlineStatus.RowId == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
+            if(ECommons.GameHelpers.Player.OnlineStatus.RowId == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
             {
                 Chat.Instance.ExecuteCommand("/pfinder");
                 return true;
@@ -155,7 +155,7 @@ public static unsafe class TaskCreateHuntPF
         }, cfg);
         P.TaskManager.Enqueue(() =>
         {
-            if (Player.Object.OnlineStatus.RowId == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
+            if (ECommons.GameHelpers.Player.OnlineStatus.RowId == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
             {
                 Chat.Instance.ExecuteCommand("/pfinder");
                 Chat.Instance.ExecuteCommand($"/e 已完成创建怪物狩猎招募");

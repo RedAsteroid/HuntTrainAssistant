@@ -229,8 +229,8 @@ public class SonarMonitor : IDisposable
 
 		public string GetGoToString(string world)
 		{
-				if (S.LifestreamIPC.CanVisitCrossDC(world)) return $"Go To (Cross-DC)";
-				return $"Go To";
+				if (S.LifestreamIPC.CanVisitCrossDC(world)) return $"前往 (超域传送)";
+				return $"前往";
 		}
 
     public World? ParseWorldFromMessage(string message)
