@@ -2,7 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Authors>NightmareXIV</Authors>
-		<DalamudApiLevel>14</DalamudApiLevel>
 		<Version>1.0.3.1</Version>
 	</PropertyGroup>
 
