@@ -86,9 +86,9 @@ public class TabIntegrations
             ImGui.Indent();
             foreach(var dc in ExcelWorldHelper.GetDataCenters(r))
             {
-                ImGuiEx.CollectionCheckbox($"{dc.Name} 数据中心", ExcelWorldHelper.GetPublicWorlds(dc.PvPRegion).Select(x => x.RowId), P.Config.WorldBlacklist);
+                ImGuiEx.CollectionCheckbox($"{dc.Name} 数据中心", ExcelWorldHelper.GetPublicWorlds(dc.RowId).Select(x => x.RowId), P.Config.WorldBlacklist);
                 ImGui.Indent();
-                foreach (var w in ExcelWorldHelper.GetPublicWorlds(dc.PvPRegion))
+                foreach (var w in ExcelWorldHelper.GetPublicWorlds(dc.RowId))
                 {
                     ImGuiEx.CollectionCheckbox($"{w.Name}", w.RowId, P.Config.WorldBlacklist);
                 }
