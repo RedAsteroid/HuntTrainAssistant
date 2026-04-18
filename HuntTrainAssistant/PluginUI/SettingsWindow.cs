@@ -27,6 +27,7 @@ public unsafe class SettingsWindow : ConfigWindow
 					("设置", TabSettings.Draw, null, true),
 					("联动", S.TabIntegrations.Draw, null, true),
 					("以太之光黑名单", S.TabAetheryteBlacklist.Draw, null, true),
+					("恶名精英黑名单", S.TabNotoriousMonsterBlacklist.Draw, null, true),
 					("Debug", TabDebug.Draw, ImGuiColors.DalamudGrey3, true),
 					("Log", InternalLog.PrintImgui, ImGuiColors.DalamudGrey3, false)
 					);

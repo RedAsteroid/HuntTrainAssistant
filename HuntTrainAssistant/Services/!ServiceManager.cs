@@ -15,6 +15,7 @@ public static class ServiceManager
 		public static TeleporterIPC TeleporterIPC;
 		public static TabAetheryteBlacklist TabAetheryteBlacklist;
 		public static TabIntegrations TabIntegrations;
+		public static TabNotoriousMonsterBlacklist TabNotoriousMonsterBlacklist;
 		public static Chat2IPC Chat2IPC;
 		public static Notificator Notificator;
 		public static LFGService LFGService;

@@ -50,6 +50,21 @@ public class TabIntegrations
             ImGuiEx.TreeNodeCollapsingHeader($"黑名单服务器 (当前有 {P.Config.WorldBlacklist.Count} 个在黑名单)###blworlds", DrawWorldBlacklist);
         })
 
+        .Section("寻路")
+        .Widget(() =>
+        {
+            ImGuiEx.TextWrapped($"以下为 Vnavmesh 的配置选项");
+            ImGui.Separator();
+            ImGui.Checkbox($"寻路终点吸附至地面", ref P.Config.SnapDestinationToGround);
+            ImGuiEx.HelpMarker("启用后，寻路终点会自动调整到地面高度，避免悬空。");
+            ImGui.Checkbox($"使用寻路终点安全距离", ref P.Config.UseSafeStopDistance);
+            ImGuiEx.HelpMarker("启用后，寻路终点会保持在安全距离之外，避免与目标过于接近。\n用于防止寻路终点与 S 级狩猎怪过于接近导致开战。");
+            //ImGuiEx.PluginAvailabilityIndicator([new("vnavmesh")]);
+            ImGui.SetNextItemWidth(200f);
+            ImGuiEx.SliderFloat("安全距离", ref P.Config.SafeStopDistance, 0, 300);
+            ImGuiEx.HelpMarker("默认 45，数值过大容易寻路到墙里，\n按住左 Ctrl 并点击以自定义输入");
+        })
+
         .Section("触发过滤")
         .Widget(() =>
         {

@@ -47,4 +47,12 @@ public class Config : IEzConfig
     public bool UseMount = true;
     public bool UseDRWorldTravelCommand = true;
     public int Mount = 0;
+
+    // vnavmesh related
+    public bool UseSafeStopDistance = false; // 寻路终点安全距离开关
+    public float SafeStopDistance = 45; // 寻路终点安全距离
+    public bool SnapDestinationToGround = true; // 寻路终点吸附地面
+
+    public List<uint> SRankBlacklist = new(); // S怪黑名单列表
+
 }

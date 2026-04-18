@@ -24,6 +24,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     internal bool IsMoving = false;
     internal Vector3 LastPosition = Vector3.Zero;
     public TaskManager TaskManager;
+    public VnavmeshIPC VnavmeshIPC;
     public int LastInstance = 0;
     public HashSet<DawntrailARank> KilledARanks = [];
     public string CommandComments;
@@ -36,7 +37,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         Config = EzConfig.Init<Config>();
         EzConfigGui.Init(new MainWindow());
         EzConfigGui.Window.RespectCloseHotkey = false;
-        EzCmd.Add("/hta", OnChatCommand, "切换显示插件界面\n/hta clear → 清除当前设置的车头\n/hta <玩家名称> → 添加新车头\n/hta pf <自由留言内容> → 创建怪物狩猎招募(不区分大小写，无参数则使用设置的自由留言, 需要启用设置)");
+        EzCmd.Add("/hta", OnChatCommand, "切换显示插件界面\n/hta clear → 清除当前设置的车头\n/hta <玩家名称> → 添加新车头\n/hta pf <自由留言内容> → 创建怪物狩猎招募(不区分大小写，无参数则使用设置的自由留言, 需要启用设置)\n/hta mts → 寻路到当前地图的 S 级狩猎怪位置");
         Svc.Chat.ChatMessage += ChatMessageHandler.Chat_ChatMessage;
         Svc.Framework.Update += Framework_Update;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
@@ -44,6 +45,7 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
 				EzIPC.OnSafeInvocationException += EzIPC_OnSafeInvocationException;
         TaskManager = new(new(timeLimitMS: 60*1000, showDebug:true));
         EzIPC.OnSafeInvocationException += (x) => x.LogInternal();
+        VnavmeshIPC = new VnavmeshIPC();
     }
 
 		private void EzIPC_OnSafeInvocationException(Exception obj)
@@ -186,31 +188,22 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         {
             P.Config.Conductors.Clear();
         }
-        // 创建怪物狩猎招募
+        // 创建怪物狩猎招募，命令触发不受限制
         else if (arguments.Equals("pf", StringComparison.OrdinalIgnoreCase))
         {
-            if (P.Config.PfinderEnable)
-            {
                 TaskCreateHuntPF.Enqueue();
-            }
-            else
-            {
-                DuoLog.Warning($"创建怪物狩猎招募按钮未启用，请在设置中启用。");
-            }
         }
-        // 创建怪物狩猎招募，自定义自由留言
+        // 创建怪物狩猎招募，自定义自由留言，命令触发不受限制
         else if (arguments.StartsWith("pf ", StringComparison.OrdinalIgnoreCase))
         {
             arguments = arguments[3..].Trim();
-            if (P.Config.PfinderEnable)
-            {
                 CommandComments = arguments;
                 TaskCreateHuntPF.Enqueue2();
-            }
-            else
-            {
-                DuoLog.Warning($"创建怪物狩猎招募按钮未启用，请在设置中启用。");
-            }
+        }
+        // 移动到 S 怪位置
+        else if (arguments.StartsWith("mts", StringComparison.OrdinalIgnoreCase))
+        {
+            TaskMovement.EnqueueMoveToSRank();
         }
         else
         {
