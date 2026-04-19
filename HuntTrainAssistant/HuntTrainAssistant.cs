@@ -29,6 +29,8 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
     public int LastInstance = 0;
     public HashSet<DawntrailARank> KilledARanks = [];
     public string CommandComments;
+    public string CommandCommentsBlu;
+    public float TmpSafeStopDistance;
 
     public HuntTrainAssistant(IDalamudPluginInterface pi)
     {
@@ -38,7 +40,13 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         Config = EzConfig.Init<Config>();
         EzConfigGui.Init(new MainWindow());
         EzConfigGui.Window.RespectCloseHotkey = false;
-        EzCmd.Add("/hta", OnChatCommand, "切换显示插件界面\n/hta clear → 清除当前设置的车头\n/hta <玩家名称> → 添加新车头\n/hta pf <自由留言内容> → 创建怪物狩猎招募(不区分大小写，无参数则使用设置的自由留言, 需要启用设置)\n/hta mts → 寻路到当前地图的 S 级狩猎怪位置");
+        EzCmd.Add("/hta", OnChatCommand, "切换显示插件界面\n/hta clear → 清除当前设置的车头\n" +
+            "/hta <玩家名称> → 添加新车头\n" +
+            "/hta pf <自由留言内容> → 创建怪物狩猎招募(无参数则使用设置的自由留言)\n" +
+            "/hta pfb <自由留言内容> → 创建青魔占位的怪物狩猎招募(无参数则使用设置的自由留言)\n" +
+            "/hta mts → 寻路到当前地图的 S 级狩猎怪位置\n" +
+            "/hta mtsd → 直接寻路到当前地图 S 级狩猎怪位置\n" +
+            "/hta mtss <距离> → 寻路到与 S 级狩猎怪参数距离的地面位置");
         Svc.Chat.ChatMessage += ChatMessageHandler.Chat_ChatMessage;
         Svc.Framework.Update += Framework_Update;
         Svc.ClientState.TerritoryChanged += ClientState_TerritoryChanged;
@@ -189,20 +197,51 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         {
             P.Config.Conductors.Clear();
         }
-        // 创建怪物狩猎招募，命令触发不受限制
+        // 创建青魔占位招募，自定义留言
+        else if (arguments.StartsWith("pfb ", StringComparison.OrdinalIgnoreCase))
+        {
+            var arg = arguments[4..].Trim();
+            CommandCommentsBlu = arg;
+            TaskCreateHuntPF.Enqueue4();
+        }
+        // 创建青魔占位招募(配置)
+        else if (arguments.Equals("pfb", StringComparison.OrdinalIgnoreCase))
+        {
+            TaskCreateHuntPF.Enqueue3();
+        }
+        // 创建招募，自定义留言
+        else if (arguments.StartsWith("pf ", StringComparison.OrdinalIgnoreCase))
+        {
+            var arg = arguments[3..].Trim();
+            CommandComments = arg;
+            TaskCreateHuntPF.Enqueue2();
+        }
+        // 创建招募(配置)
         else if (arguments.Equals("pf", StringComparison.OrdinalIgnoreCase))
         {
             TaskCreateHuntPF.Enqueue();
         }
-        // 创建怪物狩猎招募，自定义自由留言，命令触发不受限制
-        else if (arguments.StartsWith("pf ", StringComparison.OrdinalIgnoreCase))
+        // 移动到S怪位置，直接到S怪位置
+        else if (arguments.Equals("mtsd", StringComparison.OrdinalIgnoreCase))
         {
-            arguments = arguments[3..].Trim();
-            CommandComments = arguments;
-            TaskCreateHuntPF.Enqueue2();
+            TaskMovement.EnqueueMoveToSRankDirect();
         }
-        // 移动到 S 怪位置
-        else if (arguments.StartsWith("mts", StringComparison.OrdinalIgnoreCase))
+        // 移动到S怪位置，自定义安全距离
+        else if (arguments.StartsWith("mtss ", StringComparison.OrdinalIgnoreCase))
+        {
+            var arg = arguments[5..].Trim();
+            if (float.TryParse(arg, out float dist))
+            {
+                P.TmpSafeStopDistance = dist;
+                TaskMovement.EnqueueMoveToSRankWithCustomSafeDistance();
+            }
+            else
+            {
+                TaskMovement.PrintRouteMessage(TaskMovement.White("请输入有效的数字作为安全距离"));
+            }
+        }
+        // 移动到S怪位置(配置)
+        else if (arguments.Equals("mts", StringComparison.OrdinalIgnoreCase))
         {
             TaskMovement.EnqueueMoveToSRank();
         }

@@ -117,7 +117,7 @@ public class VnavmeshIPC
     /// </summary>
     [EzIPC("vnavmesh.Query.Mesh.Raycast", applyPrefix: false)]
     public readonly Func<Vector3, Vector3, bool> Raycast;
-
+    
 
     // ---------------- Window ----------------
 

@@ -10,7 +10,7 @@ namespace HuntTrainAssistant.TaskMovements;
 
 public static class TaskMovement
 {
-    private static readonly VnavmeshIPC Nav = new();
+    public static readonly VnavmeshIPC Nav = new();
 
     public static SeString White(string text)
     {
@@ -134,6 +134,123 @@ public static class TaskMovement
         PluginLog.Information($"[HuntTrainAssistant] Moving to S-rank → {finalPos} (fly={fly})");
     }
 
+    public static void EnqueueMoveToSRankDirect()
+    {
+        var allSRankIds = SRankNotoriousMonster.Data
+            .SelectMany(x => x.Value.Keys)
+            .ToHashSet();
+
+        var allSRanksOnMap = Svc.Objects
+            .Where(o => o is IBattleNpc bn && allSRankIds.Contains(bn.NameId))
+            .Cast<IBattleNpc>()
+            .Where(IsValidNpc)
+            .ToList();
+
+        if (allSRanksOnMap.Count == 0)
+        {
+            PrintRouteMessage(White("当前地图未发现 S 级狩猎怪"));
+            return;
+        }
+
+        var target = allSRanksOnMap
+            .OrderBy(bn => Vector3.Distance(bn.Position, Svc.Objects.LocalPlayer.Position))
+            .FirstOrDefault();
+
+        if (target == null)
+        {
+            PrintRouteMessage(White("目标 S 怪已消失，无法寻路"));
+            return;
+        }
+
+        // 直接移动，不使用 SmartDestination
+        var finalPos = target.Position;
+
+        TaskMount.EnqueueIfEnabled();
+        bool fly = !P.Config.ForceGroundPathfinding;
+
+        Nav.PathfindAndMoveTo(finalPos, fly);
+
+        var mapLink = BuildSRankMapLink(target);
+        var msg = new SeStringBuilder()
+            .Append(White($"直接移动到 S 级狩猎怪: {target.Name}\n"))
+            .Append(White("位置: "))
+            .Append(mapLink)
+            .Append(White($"\n飞行寻路: {(fly ? "是" : "否")}"))
+            .Build();
+
+        PrintRouteMessage(msg);
+    }
+
+    public static void EnqueueMoveToSRankWithCustomSafeDistance()
+    {
+        var allSRankIds = SRankNotoriousMonster.Data
+            .SelectMany(x => x.Value.Keys)
+            .ToHashSet();
+
+        var allSRanksOnMap = Svc.Objects
+            .Where(o => o is IBattleNpc bn && allSRankIds.Contains(bn.NameId))
+            .Cast<IBattleNpc>()
+            .Where(IsValidNpc)
+            .ToList();
+
+        if (allSRanksOnMap.Count == 0)
+        {
+            PrintRouteMessage(White("当前地图未发现 S 级狩猎怪"));
+            return;
+        }
+
+        var target = allSRanksOnMap
+            .OrderBy(bn => Vector3.Distance(bn.Position, Svc.Objects.LocalPlayer.Position))
+            .FirstOrDefault();
+
+        if (target == null)
+        {
+            PrintRouteMessage(White("目标 S 怪已消失，无法寻路"));
+            return;
+        }
+
+        var playerPos = Svc.Objects.LocalPlayer.Position;
+
+        // 保存原配置
+        float original = P.Config.SafeStopDistance;
+        bool originalUse = P.Config.UseSafeStopDistance;
+        bool originalSnap = P.Config.SnapDestinationToGround;
+
+        // 应用临时配置
+        P.Config.UseSafeStopDistance = true;
+        P.Config.SafeStopDistance = P.TmpSafeStopDistance;
+        P.Config.SnapDestinationToGround = true;
+
+        // 计算终点
+        var finalPos = SmartDestination.ComputeFinalDestination(target.Position, playerPos);
+
+        // 恢复配置
+        P.Config.SafeStopDistance = original;
+        P.Config.UseSafeStopDistance = originalUse;
+        P.Config.SnapDestinationToGround = originalSnap;
+
+        // 重置
+        P.TmpSafeStopDistance = 0;
+
+        // 开始移动
+        TaskMount.EnqueueIfEnabled();
+        bool fly = !P.Config.ForceGroundPathfinding;
+
+        Nav.PathfindAndMoveTo(finalPos, fly);
+
+        var mapLink = BuildSRankMapLink(target);
+        var msg = new SeStringBuilder()
+            .Append(White($"寻路到 S 级狩猎怪: {target.Name}\n"))
+            .Append(White("位置: "))
+            .Append(mapLink)
+            .Append(White($"\n自定义安全距离: {P.Config.SafeStopDistance:F1}"))
+            .Append(White("\n终点落地: 是"))
+            .Append(White($"\n飞行寻路: {(fly ? "是" : "否")}"))
+            .Build();
+
+        PrintRouteMessage(msg);
+    }
+
     public static bool CanFly()
     {
         return Control.GetFlightAllowedStatus() == 0 || Svc.Condition[ConditionFlag.InFlight];
@@ -151,7 +268,7 @@ public static class TaskMovement
 
 public static class SmartDestination
 {
-    private static readonly VnavmeshIPC Nav = new();
+    private static VnavmeshIPC Nav => TaskMovement.Nav;
 
     public static Vector3 ComputeFinalDestination(Vector3 targetPos, Vector3 playerPos)
     {
