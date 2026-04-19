@@ -5,11 +5,13 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using HuntTrainAssistant;
 using Lumina.Excel.Sheets;
 
+namespace HuntTrainAssistant.TaskMovements;
+
 public static class TaskMovement
 {
     private static readonly VnavmeshIPC Nav = new();
 
-    private static SeString White(string text)
+    public static SeString White(string text)
     {
         return new SeStringBuilder()
             .Add(new UIForegroundPayload(1))   // 白色
@@ -18,7 +20,7 @@ public static class TaskMovement
             .Build();
     }
 
-    private static void PrintRouteMessage(SeString msg)
+    public static void PrintRouteMessage(SeString msg)
     {
         var builder = new SeStringBuilder()
             .Append("\ue078 ") // H 图标

@@ -12,6 +12,7 @@ using HuntTrainAssistant.DataStructures;
 using HuntTrainAssistant.PluginUI;
 using HuntTrainAssistant.Services;
 using HuntTrainAssistant.Tasks;
+using HuntTrainAssistant.TaskMovements;
 using Lumina.Excel.Sheets;
 
 namespace HuntTrainAssistant;
@@ -191,14 +192,14 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         // 创建怪物狩猎招募，命令触发不受限制
         else if (arguments.Equals("pf", StringComparison.OrdinalIgnoreCase))
         {
-                TaskCreateHuntPF.Enqueue();
+            TaskCreateHuntPF.Enqueue();
         }
         // 创建怪物狩猎招募，自定义自由留言，命令触发不受限制
         else if (arguments.StartsWith("pf ", StringComparison.OrdinalIgnoreCase))
         {
             arguments = arguments[3..].Trim();
-                CommandComments = arguments;
-                TaskCreateHuntPF.Enqueue2();
+            CommandComments = arguments;
+            TaskCreateHuntPF.Enqueue2();
         }
         // 移动到 S 怪位置
         else if (arguments.StartsWith("mts", StringComparison.OrdinalIgnoreCase))

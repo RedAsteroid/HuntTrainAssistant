@@ -51,6 +51,8 @@ public unsafe class TabSettings
 								ImGui.Checkbox("在2只A怪被击杀后，自动传送将前往下一个副本区", ref P.Config.AutoSwitchInstanceTwoRanks);
 								ImGui.Checkbox("添加右键菜单选项", ref P.Config.ContextMenu);
 								ImGui.Checkbox("启用 一键创建队员招募按钮", ref P.Config.PfinderEnable);
+								ImGui.Checkbox("启用 创建招募时设置青魔占位", ref P.Config.BluPlaceholder);
+								ImGuiEx.HelpMarker("启用后，在创建队员招募时会自动设置青魔占位，并限定平均品级 531。");
 								ImGui.Checkbox("显示 记录A怪击杀信息在主窗口", ref P.Config.ShowKilledARanks);
 								ImGui.Indent();
 								ImGuiEx.Text($"队员招募自由留言");

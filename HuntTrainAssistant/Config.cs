@@ -55,4 +55,6 @@ public class Config : IEzConfig
 
     public List<uint> SRankBlacklist = new(); // S怪黑名单列表
 
+    // misc
+    public bool BluPlaceholder = false; // 青魔招募占位
 }
