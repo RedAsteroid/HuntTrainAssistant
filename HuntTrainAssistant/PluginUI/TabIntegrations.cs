@@ -63,6 +63,7 @@ public class TabIntegrations
             ImGui.SetNextItemWidth(200f);
             ImGuiEx.SliderFloat("安全距离", ref P.Config.SafeStopDistance, 0, 300);
             ImGuiEx.HelpMarker("默认 45，数值过大容易寻路到墙里，\n按住左 Ctrl 并点击以自定义输入");
+            ImGui.Checkbox($"强制使用地面寻路", ref P.Config.ForceGroundPathfinding);
         })
 
         .Section("触发过滤")

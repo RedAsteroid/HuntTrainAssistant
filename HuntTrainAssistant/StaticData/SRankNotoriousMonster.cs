@@ -78,7 +78,7 @@ public static class SRankNotoriousMonster
                 { 2959u, "巴拉乌尔" },
                 { 2968u, "萨法特" },
                 { 2969u, "阿格里帕" },
-                 // { 13108u, "故障航空机" } // Debug 遗产之地 雷转质广场
+                //{ 13108u, "故障航空机" } // Debug 遗产之地 雷转质广场
             }
         };
 

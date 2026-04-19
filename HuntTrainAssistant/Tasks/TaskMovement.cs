@@ -3,6 +3,7 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using HuntTrainAssistant;
+using HuntTrainAssistant.Tasks;
 using Lumina.Excel.Sheets;
 
 namespace HuntTrainAssistant.TaskMovements;
@@ -14,16 +15,16 @@ public static class TaskMovement
     public static SeString White(string text)
     {
         return new SeStringBuilder()
-            .Add(new UIForegroundPayload(1))   // 白色
+            .Add(new UIForegroundPayload(1))
             .Append(text)
-            .Add(RawPayload.LinkTerminator) // end
+            .Add(RawPayload.LinkTerminator)
             .Build();
     }
 
     public static void PrintRouteMessage(SeString msg)
     {
         var builder = new SeStringBuilder()
-            .Append("\ue078 ") // H 图标
+            .Append("\ue078 ")
             .Append(msg);
 
         Svc.Chat.Print(builder.Build());
@@ -54,39 +55,33 @@ public static class TaskMovement
 
     public static void EnqueueMoveToSRank()
     {
-        // 获取所有 S 怪 NameId
         var allSRankIds = SRankNotoriousMonster.Data
             .SelectMany(x => x.Value.Keys)
             .ToHashSet();
 
-        // 找到当前地图 S 怪（不排除黑名单）
         var allSRanksOnMap = Svc.Objects
             .Where(o => o is IBattleNpc bn && allSRankIds.Contains(bn.NameId))
             .Cast<IBattleNpc>()
-            .Where(IsValidNpc) // 过滤无效对象
+            .Where(IsValidNpc)
             .ToList();
 
-        // 当前地图没有 S 怪
         if (allSRanksOnMap.Count == 0)
         {
             PrintRouteMessage(White("当前地图未发现 S 级狩猎怪"));
             return;
         }
 
-        // 检查是否存在黑名单中的 S 怪
-        var blacklistedSRanks = allSRanksOnMap
+        var blacklisted = allSRanksOnMap
             .Where(bn => P.Config.SRankBlacklist.Contains(bn.NameId))
             .ToList();
 
-        // 存在 S 怪，但在黑名单
-        if (blacklistedSRanks.Count > 0)
+        if (blacklisted.Count > 0)
         {
-            var bn = blacklistedSRanks.First();
+            var bn = blacklisted.First();
             PrintRouteMessage(White($"发现 S 级狩猎怪，但在黑名单中：{bn.Name}"));
             return;
         }
 
-        // 过滤黑名单，选择最近的 S 怪
         var candidates = allSRanksOnMap
             .Where(bn => !P.Config.SRankBlacklist.Contains(bn.NameId))
             .Where(IsValidNpc)
@@ -109,31 +104,19 @@ public static class TaskMovement
             return;
         }
 
-        // 修正目标点（是否落地由配置控制）
-        var targetPos = FixPosition(target.Position);
-        if (targetPos == null)
-        {
-            PrintRouteMessage(White("寻路失败: 目标位置不在导航网格上"));
-            return;
-        }
+        // 计算最终终点（SmartDestination）
+        var finalPos = SmartDestination.ComputeFinalDestination(target.Position, playerPos);
 
-        // 安全距离（3D）
-        if (P.Config.UseSafeStopDistance)
-        {
-            var fixedTarget = FixPosition(target.Position) ?? target.Position;
+        // 上坐骑
+        TaskMount.EnqueueIfEnabled();
 
-            var dir = Vector3.Normalize(fixedTarget - playerPos);
-            var safePos = fixedTarget - dir * P.Config.SafeStopDistance;
+        // 默认飞行寻路
+        bool fly = !P.Config.ForceGroundPathfinding;
 
-            targetPos = FixPosition(safePos) ?? safePos;
-        }
-
-        // 自动寻路
-        Nav.PathfindAndMoveTo(targetPos.Value, CanFly());
+        Nav.PathfindAndMoveTo(finalPos, fly);
 
         // 输出聊天信息
         var dist = Vector3.Distance(playerPos, target.Position);
-        var ground = P.Config.SnapDestinationToGround ? "是" : "否";
         var mapLink = BuildSRankMapLink(target);
 
         var msg = new SeStringBuilder()
@@ -141,39 +124,14 @@ public static class TaskMovement
             .Append(White("位置: "))
             .Append(mapLink)
             .Append(White($"\n距离: {dist:F1}"))
-            .Append(White($"\n使用安全距离: {(P.Config.UseSafeStopDistance ? P.Config.SafeStopDistance.ToString("F1") : "否")}"))
-            .Append(White($"\n寻路到地面: {ground}"))
+            .Append(White($"\n安全距离: {(P.Config.UseSafeStopDistance ? P.Config.SafeStopDistance.ToString("F1") : "否")}"))
+            .Append(White($"\n终点落地: {(P.Config.SnapDestinationToGround ? "是" : "否")}"))
+            .Append(White($"\n飞行寻路: {(fly ? "是" : "否")}"))
             .Build();
 
         PrintRouteMessage(msg);
 
-        PluginLog.Information($"Moving to S-rank → {targetPos.Value}");
-    }
-
-    private static Vector3? FixPosition(Vector3 pos)
-    {
-        if (!P.Config.SnapDestinationToGround)
-            return pos;
-
-        var nearest = Nav.NearestPoint(pos, 5f, 10000f);
-        if (nearest != null)
-            return nearest.Value;
-
-        for (float extent = 10; extent <= 200; extent += 10)
-        {
-            nearest = Nav.NearestPoint(pos, extent, 10000f);
-            if (nearest != null)
-                return nearest.Value;
-        }
-
-        if (Math.Abs(pos.Y - Svc.Objects.LocalPlayer.Position.Y) < 30f)
-        {
-            var floor = Nav.PointOnFloor(pos, true, 10f);
-            if (floor != null)
-                return floor.Value;
-        }
-
-        return pos;
+        PluginLog.Information($"[HuntTrainAssistant] Moving to S-rank → {finalPos} (fly={fly})");
     }
 
     public static bool CanFly()
@@ -189,5 +147,73 @@ public static class TaskMovement
             && npc.Position != default
             && npc.NameId != 0;
     }
+}
 
+public static class SmartDestination
+{
+    private static readonly VnavmeshIPC Nav = new();
+
+    public static Vector3 ComputeFinalDestination(Vector3 targetPos, Vector3 playerPos)
+    {
+        targetPos = FixHighPlatform(targetPos, playerPos);
+
+        if (P.Config.UseSafeStopDistance)
+            targetPos = ApplySafeDistance(targetPos, playerPos);
+
+        targetPos = FixWallAndObstacles(targetPos, playerPos);
+
+        return targetPos;
+    }
+
+    private static Vector3 FixHighPlatform(Vector3 targetPos, Vector3 playerPos)
+    {
+        float heightDiff = targetPos.Y - playerPos.Y;
+
+        bool isHigh = heightDiff > 6f;
+        if (!isHigh)
+            return targetPos;
+
+        if (TaskMovement.CanFly())
+            return targetPos;
+
+        var edge = Nav.NearestPoint(targetPos, 10f, 10000f);
+        if (edge != null)
+            return edge.Value;
+
+        return targetPos;
+    }
+
+    private static Vector3 ApplySafeDistance(Vector3 targetPos, Vector3 playerPos)
+    {
+        var dir = Vector3.Normalize(targetPos - playerPos);
+        return targetPos - dir * P.Config.SafeStopDistance;
+    }
+
+    private static Vector3 FixWallAndObstacles(Vector3 targetPos, Vector3 playerPos)
+    {
+        var meshPoint = Nav.NearestPoint(targetPos, 50f, 10000f);
+        if (meshPoint == null)
+            return targetPos;
+
+        var retreatDir = Vector3.Normalize(meshPoint.Value - playerPos);
+        var retreatPoint = meshPoint.Value - retreatDir * 2f;
+
+        var final = Nav.NearestPoint(retreatPoint, 20f, 10000f);
+        if (final == null)
+            final = meshPoint.Value;
+
+        // raycast 检测
+        if (Nav.Raycast != null && Nav.Raycast(playerPos, final.Value))
+        {
+            var safer = final.Value - retreatDir * 2f;
+
+            var saferFinal = Nav.NearestPoint(safer, 20f, 10000f);
+            if (saferFinal != null && !Nav.Raycast(playerPos, saferFinal.Value))
+                return saferFinal.Value;
+
+            return meshPoint.Value;
+        }
+
+        return final.Value;
+    }
 }

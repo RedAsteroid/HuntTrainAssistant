@@ -111,6 +111,13 @@ public class VnavmeshIPC
     [EzIPC("vnavmesh.Query.Mesh.PointOnFloor", applyPrefix: false)]
     public readonly Func<Vector3, bool, float, Vector3?> PointOnFloor;
 
+    /// <summary>
+    /// Vector3 from, Vector3 to
+    /// true = blocked, false = clear
+    /// </summary>
+    [EzIPC("vnavmesh.Query.Mesh.Raycast", applyPrefix: false)]
+    public readonly Func<Vector3, Vector3, bool> Raycast;
+
 
     // ---------------- Window ----------------
 

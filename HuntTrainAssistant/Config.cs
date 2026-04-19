@@ -57,4 +57,5 @@ public class Config : IEzConfig
 
     // misc
     public bool BluPlaceholder = false; // 青魔招募占位
+    public bool ForceGroundPathfinding = false; //强制使用地面寻路
 }
