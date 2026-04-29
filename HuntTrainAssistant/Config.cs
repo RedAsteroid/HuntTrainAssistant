@@ -51,7 +51,8 @@ public class Config : IEzConfig
     // vnavmesh related
     public bool UseSafeStopDistance = false; // 寻路终点安全距离开关
     public float SafeStopDistance = 45; // 寻路终点安全距离
-    public bool SnapDestinationToGround = true; // 寻路终点吸附地面
+    public bool RandomDestinationOffset = true; // 寻路终点随机偏移
+    public float RandomDestinationOffsetRadius = 6; // 寻路终点随机偏移范围半径
 
     public List<uint> SRankBlacklist = new(); // S怪黑名单列表
 

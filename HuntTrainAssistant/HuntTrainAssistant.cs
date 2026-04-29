@@ -40,8 +40,11 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         Config = EzConfig.Init<Config>();
         EzConfigGui.Init(new MainWindow());
         EzConfigGui.Window.RespectCloseHotkey = false;
-        EzCmd.Add("/hta", OnChatCommand, "切换显示插件界面\n/hta clear → 清除当前设置的车头\n" +
+        EzCmd.Add("/hta", OnChatCommand, "切换显示插件界面\n" +
+            "/hta clear → 清除当前设置的车头\n" +
             "/hta <玩家名称> → 添加新车头\n" +
+            "/hta settings → 切换显示设置窗口\n" +
+            "/hta cfg → 切换显示设置窗口\n" +
             "/hta pf <自由留言内容> → 创建怪物狩猎招募(无参数则使用设置的自由留言)\n" +
             "/hta pfb <自由留言内容> → 创建青魔占位的怪物狩猎招募(无参数则使用设置的自由留言)\n" +
             "/hta mts → 寻路到当前地图的 S 级狩猎怪位置\n" +
@@ -57,12 +60,12 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         VnavmeshIPC = new VnavmeshIPC();
     }
 
-		private void EzIPC_OnSafeInvocationException(Exception obj)
-		{
+	private void EzIPC_OnSafeInvocationException(Exception obj)
+	{
         InternalLog.Error($"During handling IPC call, exception has occurred: \n{obj}");
-		}
+	}
 
-		private void ClientState_TerritoryChanged(ushort e)
+	private void ClientState_TerritoryChanged(uint e)
     {
         LastInstance = 0;
         if(TeleportTo != null)
@@ -108,14 +111,14 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                 }
             }
         }
-        if (Player.Interactable && TeleportTo?.Aetheryte != null && Svc.ClientState.LocalPlayer.CurrentHp > 0) 
+        if (Player.Interactable && TeleportTo?.Aetheryte != null && Svc.Objects.LocalPlayer.CurrentHp > 0) 
         {
             if(Utils.CheckMultiMode()) return;
             if (IsScreenReady())
             {
-                if (Svc.ClientState.LocalPlayer.IsCasting)
+                if (Svc.Objects.LocalPlayer.IsCasting)
                 {
-                    if (Svc.ClientState.LocalPlayer.CastActionId == 5)
+                    if (Svc.Objects.LocalPlayer.CastActionId == 5)
                     {
                         if (!Svc.Condition[ConditionFlag.Casting])
                         {
@@ -154,8 +157,8 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
                     }
                 }
             }
-            IsMoving = Svc.ClientState.LocalPlayer.Position != LastPosition;
-            LastPosition = Svc.ClientState.LocalPlayer.Position;
+            IsMoving = Svc.Objects.LocalPlayer.Position != LastPosition;
+            LastPosition = Svc.Objects.LocalPlayer.Position;
         }
         if (Svc.Condition[ConditionFlag.BetweenAreas] || Svc.Condition[ConditionFlag.BetweenAreas51])
         {
@@ -197,6 +200,16 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         {
             P.Config.Conductors.Clear();
         }
+        // 切换设置界面显示
+        else if (arguments.Equals("settings", StringComparison.OrdinalIgnoreCase))
+        {
+            S.SettingsWindow.Toggle();
+        }
+        // 切换设置界面显示(简易)
+        else if (arguments.Equals("cfg", StringComparison.OrdinalIgnoreCase))
+        {
+            S.SettingsWindow.Toggle();
+        }
         // 创建青魔占位招募，自定义留言
         else if (arguments.StartsWith("pfb ", StringComparison.OrdinalIgnoreCase))
         {
@@ -226,19 +239,27 @@ public unsafe class HuntTrainAssistant : IDalamudPlugin
         {
             TaskMovement.EnqueueMoveToSRankDirect();
         }
-        // 移动到S怪位置，自定义安全距离
         else if (arguments.StartsWith("mtss ", StringComparison.OrdinalIgnoreCase))
         {
             var arg = arguments[5..].Trim();
             if (float.TryParse(arg, out float dist))
             {
                 P.TmpSafeStopDistance = dist;
-                TaskMovement.EnqueueMoveToSRankWithCustomSafeDistance();
+                if (P.TmpSafeStopDistance <= 0)
+                {
+                    TaskMovement.PrintWhiteMessage("自定义安全距离无效，请输入大于 0 的数值");
+                    return;
+                }
+                TaskMovement.EnqueueMoveToSRankWithCustomSafeDistance(dist);
             }
             else
             {
-                TaskMovement.PrintRouteMessage(TaskMovement.White("请输入有效的数字作为安全距离"));
+                TaskMovement.PrintWhiteMessage("请输入有效的数字作为安全距离");
             }
+        }
+        else if (arguments.Equals("mtss", StringComparison.OrdinalIgnoreCase))
+        {
+            TaskMovement.PrintWhiteMessage("用法: /hta mtss <距离>");
         }
         // 移动到S怪位置(配置)
         else if (arguments.Equals("mts", StringComparison.OrdinalIgnoreCase))

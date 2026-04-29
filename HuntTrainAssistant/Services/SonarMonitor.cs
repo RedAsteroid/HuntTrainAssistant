@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game;
+using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
@@ -191,25 +192,42 @@ public class SonarMonitor : IDisposable
         }
     }
 
-    private void Chat_ChatMessage(XivChatType type, int a2, ref SeString sender, ref SeString message, ref bool isHandled)
+    private void Chat_ChatMessage(IHandleableChatMessage msg)
     {
-        if(Utils.CheckMultiMode()) return;
-        if(P.Config.SonarIntegration && sender.ToString() == "Sonar")
+        if (Utils.CheckMultiMode())
+            return;
+
+        var type = msg.LogKind;
+        var sender = msg.Sender;
+        var message = msg.Message;
+
+        if (P.Config.SonarIntegration && sender.ToString() == "Sonar")
         {
             var messageText = message.GetText().Replace("", "");
-            if(messageText.Contains("killed")) return;
+            if (messageText.Contains("killed"))
+                return;
+
             var world = ParseWorldFromMessage(messageText);
             var rank = ParseRankFromMessage(messageText);
             var ex = ParseExpansionFromMessage(message);
+
             var link = message.Payloads.OfType<MapLinkPayload>().FirstOrDefault();
             var aetheryte = MapManager.GetNearestAetheryte(link);
+
             PluginLog.Information($"World={world}, rank={rank}, ex={ex}, aetheryte={aetheryte.GetPlaceName()}");
-            if(world != null && rank != Rank.Unknown && ex != Expansion.Unknown && aetheryte != null)
+
+            if (world != null && rank != Rank.Unknown && ex != Expansion.Unknown && aetheryte != null)
             {
-                if(P.Config.AutoVisitModifyChat)
+                if (P.Config.AutoVisitModifyChat)
                 {
-                    var payload = CreateLinkPayload(world.Value.Name.ToString(), aetheryte.Value, link, ParseInstanceNumber(messageText.ToString()));
-                    message = new SeStringBuilder()
+                    var payload = CreateLinkPayload(
+                        world.Value.Name.ToString(),
+                        aetheryte.Value,
+                        link,
+                        ParseInstanceNumber(messageText)
+                    );
+
+                    msg.Message = new SeStringBuilder()
                         .Append(message)
                         .Append(" ")
                         .Add(payload.Payload)
@@ -219,15 +237,25 @@ public class SonarMonitor : IDisposable
                         .Add(RawPayload.LinkTerminator)
                         .Build();
                 }
-                if(world.Value.RowId == Player.CurrentWorldId || !P.Config.WorldBlacklist.Contains(world.Value.RowId))
+
+                if (world.Value.RowId == Player.CurrentWorldId ||
+                    !P.Config.WorldBlacklist.Contains(world.Value.RowId))
                 {
-                    HandleAutoTeleport(world.Value.Name.ToString(), aetheryte.Value, link, false, rank, ex, ParseInstanceNumber(message.ToString()));
+                    HandleAutoTeleport(
+                        world.Value.Name.ToString(),
+                        aetheryte.Value,
+                        link,
+                        false,
+                        rank,
+                        ex,
+                        ParseInstanceNumber(message.ToString())
+                    );
                 }
             }
         }
     }
 
-		public string GetGoToString(string world)
+    public string GetGoToString(string world)
 		{
 				if (S.LifestreamIPC.CanVisitCrossDC(world)) return $"前往 (超域传送)";
 				return $"前往";

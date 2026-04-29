@@ -39,8 +39,8 @@ public static class Utils
 						S.SonarMonitor.Continuation = null;
 						P.TaskManager.Abort();
 						P.Config.AutoVisitTeleportEnabled = false;
-            PluginLog.Debug($"TeleportTo reset (4)");
-            P.TeleportTo = null;
+						PluginLog.Debug($"TeleportTo reset (4)");
+						P.TeleportTo = null;
 						return true;
 				}
 				else
@@ -53,12 +53,12 @@ public static class Utils
 		{
 				if(P.Config.Debug) return true;
 				return Enum.GetValues<DawntrailARank>().Contains((DawntrailARank)npcId);
-    }
+		}
 
 		public static bool IsInHuntingTerritory()
 		{
 				if (ExcelTerritoryHelper.Get(Svc.ClientState.TerritoryType)?.TerritoryIntendedUse.RowId == (int)TerritoryIntendedUseEnum.Open_World) return true;
-        if (Svc.ClientState.TerritoryType.EqualsAny((ushort[])[
+        if (Svc.ClientState.TerritoryType.EqualsAny((uint[])[
             1024, //mare <-> garlemard gateway
 						682, 739, 759, //doman enclave
 						635, 659, //rhalgr's reach

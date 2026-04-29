@@ -9,6 +9,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using HuntTrainAssistant.Services;
 using static FFXIVClientStructs.Havok.Animation.Deform.Skinning.hkaMeshBinding;
 using HuntTrainAssistant.TaskMovements;
+using UIColor = ECommons.ChatMethods.UIColor;
 
 namespace HuntTrainAssistant.Tasks;
 public static unsafe class TaskCreateHuntPF
@@ -209,13 +210,15 @@ public static unsafe class TaskCreateHuntPF
             {
                 var BluPlaceholder = P.Config.BluPlaceholder ? "是" : "否";
                 var msg = new SeStringBuilder()
-                    .Append(TaskMovement.White($"已完成创建怪物狩猎招募"))
-                    .Append(TaskMovement.White($"\n自由留言内容: {P.Config.PfinderString}"))
-                    .Append(TaskMovement.White($"\n使用青魔占位: {BluPlaceholder}"))
+                    .AddUiForeground((int)UIColor.White)
+                    .Append($"\ue078 已完成创建怪物狩猎招募")
+                    .Append($"\n自由留言内容: {P.Config.PfinderString}")
+                    .Append($"\n使用青魔占位: {BluPlaceholder}")
+                    .AddUiForegroundOff()
                     .Build();
 
                 Chat.Instance.ExecuteCommand("/pfinder");
-                TaskMovement.PrintRouteMessage(msg);
+                Svc.Chat.Print(msg);
                 return true;
             }
             return false;
@@ -419,13 +422,15 @@ public static unsafe class TaskCreateHuntPF
             {
                 var BluPlaceholder = P.Config.BluPlaceholder ? "是" : "否";
                 var msg = new SeStringBuilder()
-                    .Append(TaskMovement.White($"已完成创建怪物狩猎招募"))
-                    .Append(TaskMovement.White($"\n自由留言内容: {P.CommandComments}"))
-                    .Append(TaskMovement.White($"\n使用青魔占位: {BluPlaceholder}"))
+                    .AddUiForeground((int)UIColor.White)
+                    .Append($"\ue078 已完成创建怪物狩猎招募")
+                    .Append($"\n自由留言内容: {P.CommandComments}")
+                    .Append($"\n使用青魔占位: {BluPlaceholder}")
+                    .AddUiForegroundOff()
                     .Build();
 
                 Chat.Instance.ExecuteCommand("/pfinder");
-                TaskMovement.PrintRouteMessage(msg);
+                Svc.Chat.Print(msg);
                 P.CommandComments = null;
                 return true;
             }
@@ -606,13 +611,15 @@ public static unsafe class TaskCreateHuntPF
             if (Player.Object.OnlineStatus.RowId == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
             {
                 var msg = new SeStringBuilder()
-                    .Append(TaskMovement.White($"已完成创建怪物狩猎招募"))
-                    .Append(TaskMovement.White($"\n自由留言内容: {P.Config.PfinderString}"))
-                    .Append(TaskMovement.White($"\n使用青魔占位: 是"))
+                    .AddUiForeground((int)UIColor.White)
+                    .Append($"\ue078 已完成创建怪物狩猎招募")
+                    .Append($"\n自由留言内容: {P.Config.PfinderString}")
+                    .Append($"\n使用青魔占位: 是")
+                    .AddUiForegroundOff()
                     .Build();
 
                 Chat.Instance.ExecuteCommand("/pfinder");
-                TaskMovement.PrintRouteMessage(msg);
+                Svc.Chat.Print(msg);
                 return true;
             }
             return false;
@@ -792,13 +799,15 @@ public static unsafe class TaskCreateHuntPF
             if (Player.Object.OnlineStatus.RowId == 26 && TryGetAddonByName<AtkUnitBase>("LookingForGroup", out var a) && EzThrottler.Throttle("Pfindercmd2"))
             {
                 var msg = new SeStringBuilder()
-                    .Append(TaskMovement.White($"已完成创建怪物狩猎招募"))
-                    .Append(TaskMovement.White($"\n自由留言内容: {P.CommandCommentsBlu}"))
-                    .Append(TaskMovement.White($"\n使用青魔占位: 是"))
+                    .AddUiForeground((int)UIColor.White)
+                    .Append($"\ue078已完成创建怪物狩猎招募")
+                    .Append($"\n自由留言内容: {P.CommandCommentsBlu}")
+                    .Append($"\n使用青魔占位: 是")
+                    .AddUiForegroundOff()
                     .Build();
 
                 Chat.Instance.ExecuteCommand("/pfinder");
-                TaskMovement.PrintRouteMessage(msg);
+                Svc.Chat.Print(msg);
 
                 P.CommandCommentsBlu = null;
                 return true;
