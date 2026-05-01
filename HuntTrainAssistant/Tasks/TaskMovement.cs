@@ -262,14 +262,12 @@ public static class TaskMovement
 
 public static class SmartDestination
 {
-    // 我觉得最稳健的做法是，对每个 S 怪所在的地图与位置设置专属的寻路区域，玩家只会寻路到匹配的区域并在其中随机化位置，也就是穷举法
-    // 现在无论如何都存在异常终点
     private static VnavmeshIPC Nav => TaskMovement.Nav;
 
     public static Vector3 ComputeFinalDestination(Vector3 monsterPos, Vector3 playerPos, bool isFlying)
     {
         float safeDistance = P.Config.UseSafeStopDistance ? P.Config.SafeStopDistance : 0f;
-        return ComputeUnifiedDestination(monsterPos, playerPos, safeDistance);
+        return ComputeUnifiedDestination(monsterPos, playerPos, safeDistance, isFlying);
     }
 
     public static Vector3 ComputeFinalDestinationForCustomSafeDistance(
@@ -279,16 +277,17 @@ public static class SmartDestination
         bool isFlying
     )
     {
-        return ComputeUnifiedDestination(monsterPos, playerPos, safeDistance);
+        return ComputeUnifiedDestination(monsterPos, playerPos, safeDistance, isFlying);
     }
 
-    private static Vector3 ComputeUnifiedDestination(Vector3 monsterPos, Vector3 playerPos, float safeDistance)
+    private static Vector3 ComputeUnifiedDestination(Vector3 monsterPos, Vector3 playerPos, float safeDistance, bool isFlying)
     {
         var dir = Vector3.Normalize(new Vector3(monsterPos.X - playerPos.X, 0, monsterPos.Z - playerPos.Z));
         if (dir == Vector3.Zero)
             dir = Vector3.UnitX;
 
-        if (safeDistance <= 0f)
+        bool safeDistanceEnabled = P.Config.UseSafeStopDistance && safeDistance > 0f;
+        if (!safeDistanceEnabled)
             safeDistance = 0f;
 
         var targetFlat = monsterPos - dir * safeDistance;
@@ -298,15 +297,45 @@ public static class SmartDestination
 
         const float cliffThreshold = 40f;
 
+        if (isFlying && safeDistanceEnabled)
+        {
+            float distToMonster = Vector3.Distance(
+                new(point.X, monsterPos.Y, point.Z),
+                new(monsterPos.X, monsterPos.Y, monsterPos.Z)
+            );
+
+            if (distToMonster > safeDistance + 1f)
+            {
+                const float adjustStep = 1.5f;
+                const int adjustMax = 30;
+
+                for (int i = 1; i <= adjustMax; i++)
+                {
+                    float dist = Math.Max(0.1f, distToMonster - i * adjustStep);
+
+                    var flat = monsterPos - dir * dist;
+                    var baseP = new Vector3(flat.X, 1024f, flat.Z);
+
+                    var corrected = SnapToFloor(baseP);
+
+                    float correctedDist = Vector3.Distance(
+                        new(corrected.X, monsterPos.Y, corrected.Z),
+                        new(monsterPos.X, monsterPos.Y, monsterPos.Z)
+                    );
+
+                    if (MathF.Abs(correctedDist - safeDistance) <= 1f)
+                    {
+                        point = corrected;
+                        break;
+                    }
+                }
+            }
+        }
+
         if (MathF.Abs(point.Y - monsterPos.Y) > cliffThreshold)
         {
-            bool safeDistanceEnabled = P.Config.UseSafeStopDistance && safeDistance > 0f;
-
             if (!safeDistanceEnabled)
-            {
-                //TaskMovement.PrintWhiteMessage("安全距离未启用，直接寻路到目标。");
                 return monsterPos;
-            }
 
             const float step = 3f;
             const int maxAttempts = 20;
@@ -362,7 +391,7 @@ public static class SmartDestination
                 if (MathF.Abs(candidate.Y - monsterPos.Y) > cliffThreshold)
                     continue;
 
-                if (safeDistance <= 0.01f)
+                if (!safeDistanceEnabled)
                     return candidate;
 
                 if (Vector3.Distance(new(candidate.X, monsterPos.Y, candidate.Z),
