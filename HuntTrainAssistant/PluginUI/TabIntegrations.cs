@@ -56,14 +56,15 @@ public class TabIntegrations
             ImGuiEx.TextWrapped($"以下为 Vnavmesh 的配置选项");
             ImGui.Separator();
             ImGui.Checkbox($"使用寻路终点安全距离", ref P.Config.UseSafeStopDistance);
-            ImGuiEx.HelpMarker("启用后，寻路终点将以安全距离进行修正，避免与目标过于接近。\n用于防止寻路终点与 S 级狩猎怪过于接近导致开战。");
+            ImGuiEx.HelpMarker("启用后，寻路终点将以安全距离进行修正，避免与目标过于接近。\n用于防止寻路终点与 S 级狩猎怪过于接近导致开战。" +
+                "\n\n目前使用 vnavmesh flag 同款修正方法，有一定偏差。");
             //ImGuiEx.PluginAvailabilityIndicator([new("vnavmesh")]);
             ImGui.SetNextItemWidth(200f);
             ImGuiEx.SliderFloat("安全距离", ref P.Config.SafeStopDistance, 0, 300);
             ImGuiEx.HelpMarker("默认值: 45\n按住左 Ctrl 并点击以自定义输入");
             ImGui.Checkbox($"强制使用地面寻路", ref P.Config.ForceGroundPathfinding);
             ImGui.Checkbox("随机终点偏移", ref P.Config.RandomDestinationOffset);
-            ImGuiEx.HelpMarker("启用后，寻路终点会在以设定值范围内进行随机偏移，防止玩家重叠。");
+            ImGuiEx.HelpMarker("启用后，寻路终点会在以设定值范围内进行随机偏移，防止玩家重叠。\n如果触发悬崖修正，则此次寻路随机偏移不会生效。");
             ImGui.SetNextItemWidth(200f);
             ImGuiEx.SliderFloat("随机终点偏移半径", ref P.Config.RandomDestinationOffsetRadius, 0, 15);
             ImGuiEx.HelpMarker("默认值: 6\n寻路终点随机偏移在安全距离计算之后进行，数值过大可能导致寻路过于靠近 S 怪。\n按住左 Ctrl 并点击以自定义输入");

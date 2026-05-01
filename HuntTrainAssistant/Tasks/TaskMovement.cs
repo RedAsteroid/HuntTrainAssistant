@@ -101,15 +101,6 @@ public static class TaskMovement
 
         bool fly = !P.Config.ForceGroundPathfinding;
 
-        var finalPos = SmartDestination.ComputeFinalDestination(
-            target.Position,
-            playerPos,
-            fly
-        );
-
-        TaskMount.EnqueueIfEnabled();
-        Nav.PathfindAndMoveTo(finalPos, fly);
-
         var dist = Vector3.Distance(playerPos, target.Position);
         var mapLink = BuildSRankMapLink(target);
         var random = P.Config.RandomDestinationOffset;
@@ -128,6 +119,15 @@ public static class TaskMovement
             .Build();
 
         Svc.Chat.Print(msg);
+
+        var finalPos = SmartDestination.ComputeFinalDestination(
+            target.Position,
+            playerPos,
+            fly
+        );
+
+        TaskMount.EnqueueIfEnabled();
+        Nav.PathfindAndMoveTo(finalPos, fly);
     }
 
     public static void EnqueueMoveToSRankDirect()
@@ -148,6 +148,7 @@ public static class TaskMovement
             return;
         }
 
+        var playerPos = Svc.Objects.LocalPlayer.Position;
         var target = allSRanksOnMap
             .OrderBy(bn => Vector3.Distance(bn.Position, Svc.Objects.LocalPlayer.Position))
             .FirstOrDefault();
@@ -160,9 +161,7 @@ public static class TaskMovement
 
         bool fly = !P.Config.ForceGroundPathfinding;
 
-        TaskMount.EnqueueIfEnabled();
-        Nav.PathfindAndMoveTo(target.Position, fly);
-
+        var dist = Vector3.Distance(playerPos, target.Position);
         var mapLink = BuildSRankMapLink(target);
         var random = P.Config.RandomDestinationOffset;
         var randomdistance = P.Config.RandomDestinationOffsetRadius;
@@ -172,12 +171,16 @@ public static class TaskMovement
             .Append($"\ue078 直接寻路到 S 级狩猎怪: {target.Name}\n")
             .Append("位置: ")
             .Add(mapLink.Payloads)
+            .Append($"\n距离: {dist:F1}")
             .Append($"\n飞行寻路: {(fly ? "是" : "否")}")
             .Append($"\n终点偏移: {(random ? $"是\n偏移距离: {randomdistance:F1}" : "否")}")
             .AddUiForegroundOff()
             .Build();
 
         Svc.Chat.Print(msg);
+
+        TaskMount.EnqueueIfEnabled();
+        Nav.PathfindAndMoveTo(target.Position, fly);
     }
 
     public static void EnqueueMoveToSRankWithCustomSafeDistance(float customSafeDistance)
@@ -212,16 +215,7 @@ public static class TaskMovement
 
         bool fly = !P.Config.ForceGroundPathfinding;
 
-        var finalPos = SmartDestination.ComputeFinalDestinationForCustomSafeDistance(
-            target.Position,
-            playerPos,
-            customSafeDistance,
-            fly
-        );
-
-        TaskMount.EnqueueIfEnabled();
-        Nav.PathfindAndMoveTo(finalPos, fly);
-
+        var dist = Vector3.Distance(playerPos, target.Position);
         var mapLink = BuildSRankMapLink(target);
         var random = P.Config.RandomDestinationOffset;
         var randomdistance = P.Config.RandomDestinationOffsetRadius;
@@ -231,6 +225,7 @@ public static class TaskMovement
             .Append($"\ue078 寻路到 S 级狩猎怪: {target.Name}\n")
             .Append("位置: ")
             .Add(mapLink.Payloads)
+            .Append($"\n距离: {dist:F1}")
             .Append($"\n安全距离: {customSafeDistance:F1}")
             .Append($"\n飞行寻路: {(fly ? "是" : "否")}")
             .Append($"\n终点偏移: {(random ? $"是\n偏移距离: {randomdistance:F1}" : "否")}")
@@ -238,6 +233,16 @@ public static class TaskMovement
             .Build();
 
         Svc.Chat.Print(msg);
+
+        var finalPos = SmartDestination.ComputeFinalDestinationForCustomSafeDistance(
+            target.Position,
+            playerPos,
+            customSafeDistance,
+            fly
+        );
+
+        TaskMount.EnqueueIfEnabled();
+        Nav.PathfindAndMoveTo(finalPos, fly);
     }
 
     public static bool CanFly()
@@ -257,15 +262,14 @@ public static class TaskMovement
 
 public static class SmartDestination
 {
+    // 我觉得最稳健的做法是，对每个 S 怪所在的地图与位置设置专属的寻路区域，玩家只会寻路到匹配的区域并在其中随机化位置，也就是穷举法
+    // 现在无论如何都存在异常终点
     private static VnavmeshIPC Nav => TaskMovement.Nav;
 
     public static Vector3 ComputeFinalDestination(Vector3 monsterPos, Vector3 playerPos, bool isFlying)
     {
         float safeDistance = P.Config.UseSafeStopDistance ? P.Config.SafeStopDistance : 0f;
-
-        return isFlying
-            ? ComputeFlyingGroundDestination(monsterPos, playerPos, safeDistance)
-            : ComputeGroundDestination(monsterPos, playerPos, safeDistance);
+        return ComputeUnifiedDestination(monsterPos, playerPos, safeDistance);
     }
 
     public static Vector3 ComputeFinalDestinationForCustomSafeDistance(
@@ -275,216 +279,114 @@ public static class SmartDestination
         bool isFlying
     )
     {
-        return isFlying
-            ? ComputeFlyingGroundDestination(monsterPos, playerPos, safeDistance)
-            : ComputeGroundDestination(monsterPos, playerPos, safeDistance);
+        return ComputeUnifiedDestination(monsterPos, playerPos, safeDistance);
     }
 
-    private static Vector3 ComputeFlyingGroundDestination(Vector3 monsterPos, Vector3 playerPos, float safeDistance)
+    private static Vector3 ComputeUnifiedDestination(Vector3 monsterPos, Vector3 playerPos, float safeDistance)
     {
-        var flatDir = new Vector3(monsterPos.X - playerPos.X, 0, monsterPos.Z - playerPos.Z);
-        if (flatDir == Vector3.Zero)
-            flatDir = Vector3.UnitX;
+        var dir = Vector3.Normalize(new Vector3(monsterPos.X - playerPos.X, 0, monsterPos.Z - playerPos.Z));
+        if (dir == Vector3.Zero)
+            dir = Vector3.UnitX;
 
-        var dir = Vector3.Normalize(flatDir);
+        if (safeDistance <= 0f)
+            safeDistance = 0f;
+
         var targetFlat = monsterPos - dir * safeDistance;
+        var basePos = new Vector3(targetFlat.X, 1024f, targetFlat.Z);
 
-        var basePos = new Vector3(targetFlat.X, monsterPos.Y, targetFlat.Z);
+        var point = SnapToFloor(basePos);
 
-        var reachable = Nav.NearestPointReachable(basePos, 20f, 10000f);
-        Vector3 point = reachable ?? basePos;
+        const float cliffThreshold = 40f;
 
-        if (Math.Abs(point.Y - basePos.Y) > 6f)
+        if (MathF.Abs(point.Y - monsterPos.Y) > cliffThreshold)
         {
-            for (int i = 0; i < 12; i++)
+            bool safeDistanceEnabled = P.Config.UseSafeStopDistance && safeDistance > 0f;
+
+            if (!safeDistanceEnabled)
             {
-                float angle = i * (MathF.Tau / 12f);
-                var offset = new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle)) * 3f;
+                //TaskMovement.PrintWhiteMessage("安全距离未启用，直接寻路到目标。");
+                return monsterPos;
+            }
 
-                var candidateBase = basePos + offset;
-                var candidateReachable = Nav.NearestPointReachable(candidateBase, 20f, 10000f);
-                if (candidateReachable == null)
-                    continue;
+            const float step = 3f;
+            const int maxAttempts = 20;
 
-                var candidate = candidateReachable.Value;
+            for (int i = 1; i <= maxAttempts; i++)
+            {
+                float dist = safeDistance + i * step;
 
-                if (Math.Abs(candidate.Y - basePos.Y) <= 6f)
+                var flat = monsterPos - dir * dist;
+                var baseP = new Vector3(flat.X, 1024f, flat.Z);
+
+                var corrected = SnapToFloor(baseP);
+
+                if (MathF.Abs(corrected.Y - monsterPos.Y) <= 20f)
                 {
-                    point = candidate;
-                    break;
+                    TaskMovement.PrintWhiteMessage("悬崖修正: 向外");
+                    return corrected;
                 }
             }
+
+            for (int i = 1; i <= maxAttempts; i++)
+            {
+                float dist = Math.Max(0.1f, safeDistance - i * step);
+
+                var flat = monsterPos - dir * dist;
+                var baseP = new Vector3(flat.X, 1024f, flat.Z);
+
+                var corrected = SnapToFloor(baseP);
+
+                if (MathF.Abs(corrected.Y - monsterPos.Y) <= 20f)
+                {
+                    TaskMovement.PrintWhiteMessage("悬崖修正: 向内");
+                    return corrected;
+                }
+            }
+
+            TaskMovement.PrintWhiteMessage("悬崖修正失败，寻路中止。");
+            return playerPos;
         }
 
-        if (P.Config.RandomDestinationOffset && P.Config.RandomDestinationOffsetRadius > 0)
+        if (P.Config.RandomDestinationOffset && P.Config.RandomDestinationOffsetRadius > 0f)
         {
+            float radius = Math.Max(0f, P.Config.RandomDestinationOffsetRadius);
+
             for (int i = 0; i < 10; i++)
             {
                 float angle = Random.Shared.NextSingle() * MathF.Tau;
-                float dist = Random.Shared.NextSingle() * P.Config.RandomDestinationOffsetRadius;
+                float dist = Random.Shared.NextSingle() * radius;
 
                 var offset = new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle)) * dist;
-                var candidateBase = basePos + offset;
+                var candidate = SnapToFloor(basePos + offset);
 
-                var candidateReachable = Nav.NearestPointReachable(candidateBase, 20f, 10000f);
-                if (candidateReachable == null)
+                if (MathF.Abs(candidate.Y - monsterPos.Y) > cliffThreshold)
                     continue;
 
-                var candidate = candidateReachable.Value;
-
-                if (Math.Abs(candidate.Y - basePos.Y) > 6f)
-                    continue;
-
-                var flatCandidate = new Vector3(candidate.X, monsterPos.Y, candidate.Z);
-                var flatMonster = new Vector3(monsterPos.X, monsterPos.Y, monsterPos.Z);
-
-                if (Vector3.Distance(flatCandidate, flatMonster) >= safeDistance - 1f)
+                if (safeDistance <= 0.01f)
                     return candidate;
+
+                if (Vector3.Distance(new(candidate.X, monsterPos.Y, candidate.Z),
+                                     new(monsterPos.X, monsterPos.Y, monsterPos.Z))
+                    >= safeDistance - 1f)
+                {
+                    return candidate;
+                }
             }
         }
 
         return point;
     }
 
-    private static Vector3 ComputeGroundDestination(Vector3 monsterPos, Vector3 playerPos, float safeDistance)
+    private static Vector3 SnapToFloor(Vector3 pos)
     {
-        var safePoint = ApplySafeDistance(monsterPos, playerPos, safeDistance);
-        safePoint = FixHighPlatform(safePoint, playerPos);
-        safePoint = FixWallAndObstacles(monsterPos, safePoint, safeDistance);
+        var floor = Nav.PointOnFloor(pos, true, 5f);
+        if (floor != null)
+            return floor.Value;
 
-        // 安全距离启用且为0时，不偏移
-        if (safeDistance > 0f && P.Config.RandomDestinationOffset)
-            safePoint = ApplyRandomOffset(monsterPos, safePoint, safeDistance, P.Config.RandomDestinationOffsetRadius);
+        var reachable = Nav.NearestPointReachable(pos, 20f, 10000f);
+        if (reachable != null)
+            return reachable.Value;
 
-        return FinalizeLanding(safePoint);
+        return pos;
     }
-
-    private static Vector3 ApplySafeDistance(Vector3 monsterPos, Vector3 playerPos, float safeDistance)
-    {
-        if (safeDistance <= 0f)
-            return monsterPos;
-
-        var dir = Vector3.Normalize(monsterPos - playerPos);
-        return monsterPos - dir * safeDistance;
-    }
-
-    private static Vector3 FixHighPlatform(Vector3 point, Vector3 playerPos)
-    {
-        float heightDiff = point.Y - playerPos.Y;
-
-        if (heightDiff <= 6f)
-            return point;
-
-        if (TaskMovement.CanFly())
-            return point;
-
-        var edge = Nav.NearestPoint(point, 10f, 10000f);
-        return edge ?? point;
-    }
-
-    private static Vector3 FixWallAndObstacles(Vector3 monsterPos, Vector3 safePoint, float safeDistance)
-    {
-        var mesh = Nav.NearestPoint(safePoint, 50f, 10000f);
-        if (mesh == null)
-            return safePoint;
-
-        var point = mesh.Value;
-
-        if (safeDistance <= 0f)
-            return IsReachable(point) ? point : safePoint;
-
-        if (IsReachable(point) && DistanceToMonster(point, monsterPos) >= safeDistance - 1f)
-            return point;
-
-        return FindSafeLanding(monsterPos, safeDistance);
-    }
-
-    private static Vector3 FindSafeLanding(Vector3 monsterPos, float safeDistance)
-    {
-        const int sampleCount = 32;
-        const float bandWidth = 3f;
-
-        for (float r = safeDistance - bandWidth; r <= safeDistance + bandWidth; r += 0.5f)
-        {
-            for (int i = 0; i < sampleCount; i++)
-            {
-                float angle = (float)(i * (Math.PI * 2 / sampleCount));
-
-                var dir = new Vector3((float)Math.Cos(angle), 0, (float)Math.Sin(angle));
-                var candidate = monsterPos - dir * r;
-
-                var mesh = Nav.NearestPoint(candidate, 20f, 10000f);
-                if (mesh == null)
-                    continue;
-
-                var point = mesh.Value;
-
-                if (!IsReachable(point))
-                    continue;
-
-                float dist = Vector3.Distance(point, monsterPos);
-                if (dist < safeDistance - 1f)
-                    continue;
-
-                return point;
-            }
-        }
-
-        var fallback = Nav.NearestPoint(monsterPos, safeDistance + 5f, 10000f);
-        if (fallback != null && IsReachable(fallback.Value))
-            return fallback.Value;
-
-        return monsterPos;
-    }
-
-    private static Vector3 ApplyRandomOffset(Vector3 monsterPos, Vector3 finalPos, float safeDistance, float radius)
-    {
-        if (radius <= 0f)
-            return finalPos;
-
-        for (int i = 0; i < 10; i++)
-        {
-            float angle = Random.Shared.NextSingle() * MathF.Tau;
-            float dist = Random.Shared.NextSingle() * radius;
-
-            var offset = new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle)) * dist;
-            var candidate = finalPos + offset;
-
-            var mesh = Nav.NearestPoint(candidate, 20f, 10000f);
-            if (mesh == null)
-                continue;
-
-            var point = mesh.Value;
-
-            if (!IsReachable(point))
-                continue;
-
-            if (DistanceToMonster(point, monsterPos) < safeDistance - 1f)
-                continue;
-
-            return point;
-        }
-
-        return finalPos;
-    }
-
-    private static Vector3 FinalizeLanding(Vector3 point)
-    {
-        var mesh = Nav.NearestPoint(point, 30f, 10000f);
-        if (mesh == null)
-            return point;
-
-        var p = mesh.Value;
-
-        if (!IsReachable(p))
-            return point;
-
-        return p;
-    }
-
-    private static bool IsReachable(Vector3 point)
-        => Nav.NearestPointReachable(point, 5f, 10000f) != null;
-
-    private static float DistanceToMonster(Vector3 point, Vector3 monsterPos)
-        => Vector3.Distance(point, monsterPos);
 }
