@@ -50,6 +50,12 @@ public static class TaskMovement
 
     public static void EnqueueMoveToSRank()
     {
+        if (!Nav.IsReady())
+        {
+            PrintWhiteMessage("导航系统未准备好，无法寻路");
+            return;
+        }
+
         var allSRankIds = SRankNotoriousMonster.Data
             .SelectMany(x => x.Value.Keys)
             .ToHashSet();
@@ -132,6 +138,12 @@ public static class TaskMovement
 
     public static void EnqueueMoveToSRankDirect()
     {
+        if (!Nav.IsReady())
+        {
+            PrintWhiteMessage("导航系统未准备好，无法寻路");
+            return;
+        }
+
         var allSRankIds = SRankNotoriousMonster.Data
             .SelectMany(x => x.Value.Keys)
             .ToHashSet();
@@ -185,6 +197,12 @@ public static class TaskMovement
 
     public static void EnqueueMoveToSRankWithCustomSafeDistance(float customSafeDistance)
     {
+        if (!Nav.IsReady())
+        {
+            PrintWhiteMessage("导航系统未准备好，无法寻路");
+            return;
+        }
+
         var allSRankIds = SRankNotoriousMonster.Data
             .SelectMany(x => x.Value.Keys)
             .ToHashSet();
